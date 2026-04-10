@@ -40,12 +40,47 @@ function App() {
     return () => unsub();
   }, [currentChar]);
 
+// 1. Manejo de errores de Firebase traducidos
+  const getErrorMessage = (code) => {
+    switch (code) {
+      case 'auth/invalid-email': return "El formato del correo no es válido.";
+      case 'auth/weak-password': return "La contraseña debe tener al menos 6 caracteres.";
+      case 'auth/wrong-password': return "Contraseña incorrecta.";
+      default: return "Error de conexión. Inténtalo de nuevo.";
+    }
+  };
+
+  // 2. Función de Auth unificada (Login/Registro)
   const handleEmailAuth = async (e) => {
     e.preventDefault();
-    try { await signInWithEmailAndPassword(auth, email, password); } 
-    catch { 
-        try { await createUserWithEmailAndPassword(auth, email, password); } 
-        catch (err) { alert(err.message); }
+    if (!email || !password) return alert("Por favor, completa todos los campos.");
+    
+    try {
+      // Intentamos iniciar sesión
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      // Si el usuario no existe, lo registramos automáticamente
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          alert("¡Cuenta creada con éxito! Bienvenido a CodeShelf.");
+        } catch (regError) {
+          alert(getErrorMessage(regError.code));
+        }
+      } else {
+        alert(getErrorMessage(error.code));
+      }
+    }
+  };
+
+  // 3. Google Login simplificado
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      if (error.code !== 'auth/cancelled-popup-request') {
+        alert("Error al conectar con Google.");
+      }
     }
   };
 
@@ -56,13 +91,42 @@ function App() {
     setIsSaving(false);
   };
 
-  const updatePixel = (i, val) => {
+// 1. Actualización inteligente de píxeles
+  const updatePixel = (i, value) => {
+    // Evitamos renderizados innecesarios si el píxel ya tiene ese valor
+    if (grid[i] === value) return;
+
     const newGrid = [...grid];
-    if (newGrid[i] === val) return;
-    newGrid[i] = val;
+    newGrid[i] = value;
     setGrid(newGrid);
+
+    // Guardamos en el estado local de la fuente
     const newFontData = { ...fontData, [currentChar]: newGrid };
     setFontData(newFontData);
+  };
+
+  // 2. Lógica para cambiar de letra (con auto-guardado preventivo)
+  const switchChar = (char) => {
+    // Sincronizamos con la nube antes de cambiar para no perder progreso
+    handleSaveFont(); 
+    
+    setCurrentChar(char);
+    
+    // Si la letra ya existe, la cargamos. Si no, creamos un grid vacío del tamaño actual.
+    const savedGrid = fontData[char];
+    if (savedGrid && savedGrid.length === gridSize * gridSize) {
+      setGrid(savedGrid);
+    } else {
+      setGrid(Array(gridSize * gridSize).fill(false));
+    }
+  };
+
+  // 3. Manejador de "Dibujo Continuo"
+  // Esta función se activa cuando pasas el mouse por encima de un píxel
+  const handleMouseEnter = (i) => {
+    if (isDrawing) {
+      updatePixel(i, true);
+    }
   };
 
   const exportTTF = () => {
