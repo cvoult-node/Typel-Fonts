@@ -82,6 +82,30 @@ function App() {
     setIsSaving(false);
   };
 
+  const exportarFuente = () => {
+  if (Object.keys(fontData).length === 0) {
+    alert("¡Primero dibuja algunas letras!");
+    return;
+  }
+
+  // Convertimos el objeto fontData a una cadena de texto JSON
+  const dataStr = JSON.stringify(fontData, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  
+  // Creamos un link invisible para forzar la descarga
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  
+  link.href = url;
+  link.download = `codeshelf_font_${user.email.split('@')[0]}.json`;
+  document.body.appendChild(link);
+  link.click();
+  
+  // Limpiamos el link
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
   if (loading) return React.createElement('div', { className: "h-screen bg-black flex items-center justify-center text-cyan-400 font-bold" }, "CARGANDO CODESHELF...");
 
   if (!user) {
