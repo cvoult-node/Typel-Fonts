@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'https://esm.sh/react@18.2.0';
 import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
-import opentype from 'https://esm.sh/opentype.js'; // Librería para generar fuentes
+import opentype from 'https://esm.sh/opentype.js';
 import { 
   auth, provider, db, signInWithPopup, signOut, onAuthStateChanged, 
   signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc, getDoc 
@@ -9,7 +9,7 @@ import {
 const TECLADO = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N','Ñ','O','P','Q','R','S','T','U','V','W','X','Y','Z',
   'a','b','c','d','e','f','g','h','i','j','k','l','m','n','ñ','o','p','q','r','s','t','u','v','w','x','y','z',
-  '0','1','2','3','4','5','6','7','8','9',' ','!','?','.',',',':'
+  '0','1','2','3','4','5','6','7','8','9',' ','!','?','.',',',':','-','+','='
 ];
 
 function App() {
@@ -17,8 +17,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [previewText, setPreviewText] = useState("CODESHELF");
+  const [isDrawing, setIsDrawing] = useState(false); // Para pintar arrastrando
 
   const [currentChar, setCurrentChar] = useState('A');
   const [fontData, setFontData] = useState({}); 
@@ -44,13 +44,20 @@ function App() {
   const handleSaveFont = async (data = fontData) => {
     if (!user) return;
     setIsSaving(true);
-    await setDoc(doc(db, "fuentes", user.uid), { font: data }, { merge: true });
+    try {
+      await setDoc(doc(db, "fuentes", user.uid), { 
+        font: data, 
+        author: user.email,
+        updatedAt: new Date() 
+      }, { merge: true });
+    } catch (e) { console.error(e); }
     setIsSaving(false);
   };
 
-  const togglePixel = (i) => {
+  const updatePixel = (i, value) => {
     const newGrid = [...grid];
-    newGrid[i] = !newGrid[i];
+    if (newGrid[i] === value) return; // Evita renders innecesarios
+    newGrid[i] = value;
     setGrid(newGrid);
     const newFontData = { ...fontData, [currentChar]: newGrid };
     setFontData(newFontData);
@@ -62,134 +69,121 @@ function App() {
     setGrid(fontData[char] || Array(64).fill(false));
   };
 
-  // --- LÓGICA DE ARCHIVOS ---
-  
-  const exportarJSON = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fontData));
-    const link = document.createElement("a");
-    link.href = dataStr; link.download = "codeshelf_backup.json";
-    link.click();
-    setMenuOpen(false);
-  };
-
-  const importarJSON = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const imported = JSON.parse(event.target.result);
-      setFontData(imported);
-      if (imported[currentChar]) setGrid(imported[currentChar]);
-      handleSaveFont(imported);
-      alert("✅ Fuente importada correctamente");
-    };
-    reader.readAsText(file);
-    setMenuOpen(false);
-  };
-
+  // --- EXPORTAR TTF ---
   const exportarTTF = () => {
-    const notDefGlyph = new opentype.Glyph({ name: '.notdef', unicode: 0, advanceWidth: 650, path: new opentype.Path() });
-    const glyphs = [notDefGlyph];
-
+    const glyphs = [new opentype.Glyph({ name: '.notdef', unicode: 0, advanceWidth: 650, path: new opentype.Path() })];
     Object.keys(fontData).forEach(char => {
       const pixels = fontData[char];
       const path = new opentype.Path();
-      const scale = 100; // Tamaño de cada pixel en el archivo de fuente
-
+      const s = 100;
       pixels.forEach((active, i) => {
         if (active) {
-          const x = (i % 8) * scale;
-          const y = (7 - Math.floor(i / 8)) * scale; // Invertimos Y para formato de fuente
-          path.moveTo(x, y);
-          path.lineTo(x + scale, y);
-          path.lineTo(x + scale, y + scale);
-          path.lineTo(x, y + scale);
-          path.close();
+          const x = (i % 8) * s;
+          const y = (7 - Math.floor(i / 8)) * s;
+          path.moveTo(x, y); path.lineTo(x+s, y); path.lineTo(x+s, y+s); path.lineTo(x, y+s); path.close();
         }
       });
-
-      glyphs.push(new opentype.Glyph({
-        name: char,
-        unicode: char.charCodeAt(0),
-        advanceWidth: 900,
-        path: path
-      }));
+      glyphs.push(new opentype.Glyph({ name: char, unicode: char.charCodeAt(0), advanceWidth: 900, path }));
     });
-
-    const font = new opentype.Font({
-      familyName: 'CodeShelfFont',
-      styleName: 'Medium',
-      unitsPerEm: 1000,
-      ascender: 800,
-      descender: -200,
-      glyphs: glyphs
-    });
-
-    font.download();
-    setMenuOpen(false);
+    new opentype.Font({ familyName: 'CodeShelfCustom', styleName: 'Regular', unitsPerEm: 1000, ascender: 800, descender: -200, glyphs }).download();
   };
 
-  // --- INTERFAZ ---
-
-  if (loading) return React.createElement('div', { className: "h-screen bg-black flex items-center justify-center text-cyan-400" }, "INICIANDO...");
-
-  if (!user) {
-    return React.createElement('div', { className: "h-screen flex flex-col items-center justify-center bg-black text-white" },
-      React.createElement('h1', { className: "text-4xl font-bold text-cyan-400 mb-8" }, "CODE SHELF"),
-      React.createElement('button', { onClick: () => signInWithPopup(auth, provider), className: "bg-white text-black px-10 py-4 rounded-full font-bold" }, "ENTRAR CON GOOGLE")
+  // --- RENDERIZADO DE MINI PREVIEW ---
+  const renderMiniGlyph = (char) => {
+    const pixels = fontData[char] || Array(64).fill(false);
+    return React.createElement('div', { className: "grid grid-cols-8 gap-[1px] w-8 h-8 bg-neutral-800 p-[1px]" },
+      pixels.map((p, i) => React.createElement('div', { key: i, className: `w-full h-full ${p ? 'bg-cyan-400' : 'bg-transparent'}` }))
     );
-  }
+  };
 
-  return React.createElement('div', { className: "min-h-screen bg-neutral-950 text-white p-4" },
-    // HEADER CON MENÚ
-    React.createElement('header', { className: "max-w-5xl mx-auto flex justify-between items-center mb-8 bg-neutral-900 p-4 rounded-2xl border border-neutral-800" },
-      React.createElement('div', { className: "relative" },
-        React.createElement('button', { 
-          onClick: () => setMenuOpen(!menuOpen),
-          className: "bg-neutral-800 px-4 py-2 rounded-lg text-sm font-bold hover:bg-neutral-700 transition"
-        }, "📂 ARCHIVO"),
-        
-        menuOpen && React.createElement('div', { className: "absolute top-12 left-0 w-48 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl z-50 p-2 flex flex-col gap-1" },
-          React.createElement('button', { onClick: exportarJSON, className: "text-left p-2 hover:bg-neutral-800 rounded text-xs" }, "📤 Exportar JSON"),
-          React.createElement('button', { onClick: () => fileInputRef.current.click(), className: "text-left p-2 hover:bg-neutral-800 rounded text-xs" }, "📥 Importar JSON"),
-          React.createElement('hr', { className: "border-neutral-800 my-1" }),
-          React.createElement('button', { onClick: exportarTTF, className: "text-left p-2 hover:bg-cyan-900/30 text-cyan-400 rounded text-xs font-bold" }, "🎯 GENERAR .TTF"),
-          React.createElement('hr', { className: "border-neutral-800 my-1" }),
-          React.createElement('button', { onClick: () => signOut(auth), className: "text-left p-2 hover:bg-red-900/20 text-red-500 rounded text-xs" }, "🚪 Salir")
-        )
-      ),
-      React.createElement('h2', { className: "text-cyan-400 font-black tracking-widest" }, "CODESHELF"),
-      React.createElement('div', { className: "w-20" }) // Balance visual
+  if (loading) return React.createElement('div', { className: "h-screen bg-black flex items-center justify-center text-cyan-400 font-mono tracking-widest" }, "LOADING_PROJECT...");
+
+  if (!user) { /* ... Login Code ... */ }
+
+  return React.createElement('div', { className: "min-h-screen bg-[#050505] text-white font-sans selection:bg-cyan-500/30" },
+    
+    // NAV BAR
+    React.createElement('nav', { className: "sticky top-0 z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl" },
+      React.createElement('div', { className: "max-w-7xl mx-auto px-6 h-16 flex items-center justify-between" },
+        React.createElement('div', { className: "flex items-center gap-8" },
+          React.createElement('span', { className: "text-xl font-black italic tracking-tighter text-cyan-400" }, "CODESHELF.IO"),
+          React.createElement('div', { className: "relative" },
+            React.createElement('button', { onClick: () => setMenuOpen(!menuOpen), className: "text-xs font-bold text-neutral-400 hover:text-white transition" }, "PROJECT"),
+            menuOpen && React.createElement('div', { className: "absolute top-10 left-0 w-48 bg-neutral-900 border border-white/10 rounded-xl shadow-2xl p-2" },
+              React.createElement('button', { onClick: exportarTTF, className: "w-full text-left p-3 hover:bg-cyan-500/10 rounded-lg text-xs text-cyan-400 font-bold" }, "DOWNLOAD .TTF"),
+              React.createElement('button', { onClick: () => signOut(auth), className: "w-full text-left p-3 hover:bg-red-500/10 rounded-lg text-xs text-red-500" }, "EXIT")
+            )
+          )
+        ),
+        React.createElement('div', { className: "text-[10px] text-neutral-600 font-mono" }, user.email)
+      )
     ),
 
-    React.createElement('input', { type: "file", ref: fileInputRef, className: "hidden", accept: ".json", onChange: importarJSON }),
+    React.createElement('main', { className: "max-w-7xl mx-auto p-6 grid lg:grid-cols-[1fr_350px] gap-8" },
+      
+      // COLUMNA IZQUIERDA: EDITOR
+      React.createElement('section', null,
+        React.createElement('div', { className: "bg-neutral-900/40 border border-white/5 rounded-3xl p-8 flex flex-col items-center shadow-inner" },
+          React.createElement('div', { className: "w-full flex justify-between items-end mb-8" },
+            React.createElement('div', null,
+              React.createElement('h2', { className: "text-xs font-bold text-neutral-500 uppercase tracking-widest mb-1" }, "Character Editor"),
+              React.createElement('div', { className: "text-5xl font-black text-white" }, currentChar)
+            ),
+            React.createElement('button', { onClick: () => setGrid(Array(64).fill(false)), className: "text-[10px] text-neutral-500 hover:text-red-400 transition" }, "CLEAR GRID")
+          ),
 
-    // CUERPO DEL EDITOR
-    React.createElement('div', { className: "max-w-5xl mx-auto grid md:grid-cols-2 gap-8" },
-      React.createElement('div', { className: "flex flex-col items-center" },
-        React.createElement('div', { className: "text-5xl font-mono mb-6 text-cyan-400 bg-neutral-900 w-20 h-20 flex items-center justify-center rounded-2xl border border-cyan-900/50" }, currentChar),
-        React.createElement('div', { className: "grid grid-cols-8 gap-1 bg-neutral-900 p-3 rounded-xl border border-neutral-800 shadow-2xl" },
-          grid.map((active, i) => React.createElement('div', {
-            key: i,
-            onClick: () => togglePixel(i),
-            className: `w-10 h-10 md:w-12 md:h-12 cursor-pointer transition-all rounded-sm ${active ? 'bg-cyan-400 shadow-[0_0_15px_cyan]' : 'bg-black hover:bg-neutral-800'}`
-          }))
+          // GRID INTERACTIVO (Pintar arrastrando)
+          React.createElement('div', { 
+            className: "grid grid-cols-8 gap-1.5 bg-black p-4 rounded-2xl border border-white/5 shadow-2xl",
+            onMouseDown: () => setIsDrawing(true),
+            onMouseUp: () => setIsDrawing(false),
+            onMouseLeave: () => setIsDrawing(false)
+          },
+            grid.map((active, i) => React.createElement('div', {
+              key: i,
+              onMouseEnter: () => isDrawing && updatePixel(i, true),
+              onMouseDown: () => updatePixel(i, !active),
+              className: `w-12 h-12 md:w-14 md:h-14 rounded-md cursor-crosshair transition-all duration-150 ${active ? 'bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.6)] border-transparent' : 'bg-neutral-900 border border-white/5 hover:border-white/20'}`
+            }))
+          ),
+
+          React.createElement('button', { 
+            onClick: () => handleSaveFont(),
+            className: "mt-10 w-full max-w-md py-4 bg-white text-black rounded-2xl font-black text-sm tracking-widest hover:bg-cyan-400 transition-colors shadow-xl"
+          }, isSaving ? "SYNCING..." : "SAVE CHANGES")
         ),
-        React.createElement('button', { onClick: () => handleSaveFont(), className: "mt-6 w-full bg-cyan-600 py-4 rounded-xl font-bold shadow-lg shadow-cyan-900/20" }, isSaving ? "GUARDANDO..." : "GUARDAR NUBE")
+
+        // VISTA PREVIA DE TEXTO
+        React.createElement('div', { className: "mt-8 bg-neutral-900/20 border border-white/5 rounded-3xl p-8" },
+          React.createElement('input', { 
+            value: previewText, 
+            onChange: (e) => setPreviewText(e.target.value),
+            className: "w-full bg-transparent text-2xl font-bold outline-none mb-6 placeholder:text-neutral-800",
+            placeholder: "Type to preview..."
+          }),
+          React.createElement('div', { className: "flex flex-wrap gap-2" },
+            previewText.split('').map((char, i) => React.createElement('div', { key: i }, renderMiniGlyph(char)))
+          )
+        )
       ),
 
-      React.createElement('div', { className: "bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800" },
-        React.createElement('p', { className: "text-[10px] text-neutral-500 mb-4 font-bold tracking-widest" }, "TECLADO"),
-        React.createElement('div', { className: "flex flex-wrap gap-2 max-h-[400px] overflow-y-auto pr-2" },
+      // COLUMNA DERECHA: TECLADO
+      React.createElement('aside', { className: "bg-neutral-900/40 border border-white/5 rounded-3xl p-6" },
+        React.createElement('h3', { className: "text-xs font-bold text-neutral-600 mb-6 uppercase tracking-[0.3em]" }, "Glyph Map"),
+        React.createElement('div', { className: "grid grid-cols-4 gap-2 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar" },
           TECLADO.map(t => {
-            const tiene = fontData[t] && fontData[t].some(p => p === true);
+            const hasData = fontData[t] && fontData[t].some(p => p === true);
             return React.createElement('button', {
               key: t,
               onClick: () => switchChar(t),
-              className: `w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-bold transition-all ${
-                currentChar === t ? 'bg-cyan-400 text-black border-white' : 
-                tiene ? 'border-cyan-500/50 text-cyan-400 bg-cyan-900/10' : 'bg-neutral-900 border-neutral-800 text-neutral-600'
+              className: `h-14 flex flex-col items-center justify-center rounded-xl border transition-all ${
+                currentChar === t ? 'bg-white text-black border-white shadow-lg scale-105' : 
+                hasData ? 'border-cyan-500/30 text-cyan-400 bg-cyan-500/5' : 'bg-black border-white/5 text-neutral-600 hover:border-white/20'
               }`
-            }, t);
+            }, 
+              React.createElement('span', { className: "text-xs font-bold" }, t),
+              hasData && React.createElement('div', { className: "w-1 h-1 bg-cyan-400 rounded-full mt-1" })
+            );
           })
         )
       )
