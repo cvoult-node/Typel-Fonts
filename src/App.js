@@ -131,13 +131,20 @@ function App() {
     new opentype.Font({ familyName: 'CodeShelf', styleName: 'Reg', unitsPerEm: 1000, ascender: 800, descender: -200, glyphs }).download();
   };
 
-  // VISTAS
+// --- VISTAS (RENDERIZADO) ---
+
   if (loading) return React.createElement('div', { className: "h-screen bg-black flex items-center justify-center text-cyan-400 font-mono" }, "SISTEMA_INICIANDO...");
 
   if (!user) return React.createElement('div', { className: "h-screen bg-black flex items-center justify-center p-4" },
     React.createElement('div', { className: "w-full max-w-sm bg-neutral-900 p-8 rounded-3xl border border-white/10" },
       React.createElement('h1', { className: "text-3xl font-black text-center mb-6 text-white" }, "CODE SHELF"),
-      React.createElement('form', { onSubmit: (e) => { e.preventDefault(); signInWithEmailAndPassword(auth, email, password).catch(() => createUserWithEmailAndPassword(auth, email, password)); }, className: "flex flex-col gap-3" },
+      React.createElement('form', { 
+        onSubmit: (e) => { 
+          e.preventDefault(); 
+          signInWithEmailAndPassword(auth, email, password).catch(() => createUserWithEmailAndPassword(auth, email, password)); 
+        }, 
+        className: "flex flex-col gap-3" 
+      },
         React.createElement('input', { type: "email", placeholder: "Email", value: email, onChange: e => setEmail(e.target.value), className: "bg-black border border-white/5 p-3 rounded-xl text-white outline-none focus:border-cyan-400" }),
         React.createElement('input', { type: "password", placeholder: "Password", value: password, onChange: e => setPassword(e.target.value), className: "bg-black border border-white/5 p-3 rounded-xl text-white outline-none focus:border-cyan-400" }),
         React.createElement('button', { className: "bg-cyan-600 py-3 rounded-xl font-bold text-white hover:bg-cyan-500" }, "ENTRAR / REGISTRAR")
@@ -185,39 +192,44 @@ function App() {
           onMouseDown: () => setIsDrawing(true), onMouseUp: () => setIsDrawing(false), onMouseLeave: () => setIsDrawing(false)
         },
           grid.map((a, i) => React.createElement('div', {
-            key: i, onMouseEnter: () => isDrawing && updatePixel(i, true), onMouseDown: () => updatePixel(i, !a),
+            key: i, 
+            onMouseEnter: () => isDrawing && updatePixel(i, true), 
+            onMouseDown: () => updatePixel(i, !a),
             className: `w-full h-full transition-all ${a ? 'bg-cyan-400' : 'bg-black hover:bg-neutral-800'}`
           }))
         ),
         React.createElement('button', { onClick: () => handleSaveFont(), className: "mt-6 w-full max-w-[450px] py-4 bg-cyan-600 rounded-xl font-bold" }, isSaving ? "GUARDANDO..." : "GUARDAR CAMBIOS")
       ),
-                        
-    React.createElement('aside', { className: "bg-neutral-900/80 border border-white/5 rounded-[2rem] p-6 backdrop-blur-xl" },
-      React.createElement('div', { className: "flex justify-between items-center mb-6" },
-        React.createElement('h3', { className: "text-[10px] font-black tracking-[0.2em] text-neutral-500 uppercase" }, "Mapa de Caracteres"),
-        React.createElement('button', { onClick: clearCanvas, className: "text-[10px] text-red-400 hover:bg-red-500/10 px-2 py-1 rounded" }, "LIMPIAR")
-      ),
-      React.createElement('div', { className: "grid grid-cols-4 gap-2 h-[65vh] overflow-y-auto pr-2 custom-scrollbar" },
-        TECLADO.map(t => {
-          const isConfigured = fontData[t] && fontData[t].some(p => p === true);
-          return React.createElement('button', {
-            key: t, 
-            onClick: () => switchChar(t),
-            className: `relative group h-14 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-lg ${
-              currentChar === t 
-                ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' 
-                : isConfigured 
-                  ? 'border-cyan-900/50 bg-cyan-900/10 text-cyan-400' 
-                  : 'border-white/5 bg-black/40 text-neutral-600 hover:border-white/20'
-            }`
-          }, 
-            t,
-            isConfigured && currentChar !== t && React.createElement('div', { 
-              className: "absolute top-1 right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full" 
-            })
-          );
-        })
+      React.createElement('aside', { className: "bg-neutral-900/80 border border-white/5 rounded-[2rem] p-6 backdrop-blur-xl" },
+        React.createElement('div', { className: "flex justify-between items-center mb-6" },
+          React.createElement('h3', { className: "text-[10px] font-black tracking-[0.2em] text-neutral-500 uppercase" }, "Mapa de Caracteres"),
+          React.createElement('button', { onClick: clearCanvas, className: "text-[10px] text-red-400 hover:bg-red-500/10 px-2 py-1 rounded" }, "LIMPIAR")
+        ),
+        React.createElement('div', { className: "grid grid-cols-4 gap-2 h-[65vh] overflow-y-auto pr-2 custom-scrollbar" },
+          TECLADO.map(t => {
+            const isConfigured = fontData[t] && fontData[t].some(p => p === true);
+            return React.createElement('button', {
+              key: t, 
+              onClick: () => switchChar(t),
+              className: `relative group h-14 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-lg ${
+                currentChar === t 
+                  ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' 
+                  : isConfigured 
+                    ? 'border-cyan-900/50 bg-cyan-900/10 text-cyan-400' 
+                    : 'border-white/5 bg-black/40 text-neutral-600 hover:border-white/20'
+              }`
+            }, 
+              t,
+              isConfigured && currentChar !== t && React.createElement('div', { 
+                className: "absolute top-1 right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full" 
+              })
+            );
+          })
+        )
       )
     )
+  );
+} // <--- CIERRE DE LA FUNCIÓN App
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(React.createElement(App));
