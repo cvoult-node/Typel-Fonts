@@ -96,12 +96,25 @@ function App() {
     setFontData(newFontData);
   };
 
+// 1. Mejoramos el cambio de letra para que sea instantáneo
   const switchChar = (char) => {
+    if (currentChar === char) return;
+    
     handleSaveFont();
+    
     setCurrentChar(char);
-    setGrid(fontData[char] || Array(gridSize * gridSize).fill(false));
+    const nextGrid = fontData[char] || Array(gridSize * gridSize).fill(false);
+    setGrid(nextGrid);
   };
 
+  const clearCanvas = () => {
+    if (confirm("¿Limpiar todo el dibujo de esta letra?")) {
+      const empty = Array(gridSize * gridSize).fill(false);
+      setGrid(empty);
+      setFontData(prev => ({ ...prev, [currentChar]: empty }));
+    }
+  };
+  
   const exportTTF = () => {
     const glyphs = [new opentype.Glyph({ name: '.notdef', unicode: 0, advanceWidth: 650, path: new opentype.Path() })];
     Object.keys(fontData).forEach(char => {
