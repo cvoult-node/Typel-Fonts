@@ -8,7 +8,13 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAR4AkM8MaQBqA1MDUyQf5UeCqSntdiz70",
@@ -24,7 +30,6 @@ export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 
-// Exportamos las nuevas funciones
 export { 
   signInWithPopup, 
   signOut, 
@@ -32,5 +37,6 @@ export {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   doc, 
-  setDoc 
+  setDoc,
+  getDoc
 };
