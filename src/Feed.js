@@ -3,8 +3,8 @@
 // ─────────────────────────────────────────────
 import React from 'https://esm.sh/react@18.2.0';
 // Importamos la función con alias para evitar conflictos y el objeto auth desde tu configuración
-import { signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { auth } from '../firebase.js'; 
+import { signOut as SignOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { auth } from './firebase.js'; 
 
 import { ACCENT, R_CARD, R_BTN, FONT_MONO, FONT_PIXEL } from './constants.js';
 import { Btn, Icon, Overlay, Modal, Label } from './ui.js';
