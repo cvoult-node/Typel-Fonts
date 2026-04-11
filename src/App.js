@@ -433,205 +433,133 @@ function App() {
     )
   );
 
-/* ── Dashboard (Red Social) ── */
+/* ── Dashboard ── */
 if (setupMode) return React.createElement('div', {
-  style: { minHeight: '100vh', background: cv('--bg'), color: cv('--text'), padding: '24px' }
+  style: { minHeight: '100vh', background: cv('--bg'), color: cv('--text'), padding: '32px' }
 },
-  React.createElement('div', { style: { maxWidth: '700px', margin: '0 auto' } },
-    
-    /* Header Social */
+  React.createElement('div', { style: { maxWidth: '1100px', margin: '0 auto' } },
+    /* Header */
     React.createElement('header', {
       style: {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        marginBottom: '32px', paddingBottom: '16px',
+        marginBottom: '48px', paddingBottom: '24px',
         borderBottom: `1px solid ${cv('--border')}`
       }
     },
       React.createElement('div', null,
         React.createElement('h1', {
           style: {
-            fontFamily: '"Press Start 2P",cursive', fontSize: '14px',
-            color: '#ff0000' // Rojo puro
+            fontFamily: '"Press Start 2P",cursive', fontSize: '16px', lineHeight: 1.7,
+            color: '#ff0000'
           }
         }, 'CODESHELF'),
         React.createElement('p', {
-          style: { color: cv('--text-muted'), fontSize: '9px', marginTop: '4px' }
+          style: { color: cv('--text-muted'), fontSize: '9px', letterSpacing: '4px', marginTop: '8px' }
         }, 'SOCIAL FEED')
       ),
-      
-      /* Menú de Usuario (Esquina derecha) */
-      React.createElement('div', { style: { display: 'flex', gap: '12px', alignItems: 'center' } },
+      React.createElement('div', { style: { display: 'flex', gap: '10px', alignItems: 'center' } },
+        /* Toggle de Tema con Iconos SVG */
         React.createElement(Btn, {
           onClick: toggleTheme,
-          style: { background: 'none', border: 'none', fontSize: '18px' }
-        }, isDark ? '☀️' : '🌙'),
+          style: {
+            background: cv('--surface2'), border: `1px solid ${cv('--border')}`,
+            borderRadius: '4px', padding: '10px', display: 'flex', alignItems: 'center'
+          }
+        }, React.createElement(Icon, { name: isDark ? 'sun' : 'moon', size: 18 })),
         
-        /* Avatar con Dropdown (Simulado) */
-        React.createElement('div', { 
-          style: { position: 'relative', cursor: 'pointer' },
-          onClick: () => setShowUserMenu(!showUserMenu) // Necesitarás este state
-        },
-          React.createElement('div', {
-            style: {
-              width: '40px', height: '40px', borderRadius: '4px', // Bordes más cuadrados
-              background: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: `1px solid ${cv('--border')}`
-            }
-          }, React.createElement(Icon, { name: 'user', size: 24 })),
-          
-          /* Menú Desplegable de Proyectos */
-          showUserMenu && React.createElement('div', {
-            style: {
-              position: 'absolute', top: '50px', right: 0, width: '200px',
-              background: cv('--bg'), border: `1px solid ${cv('--border')}`,
-              borderRadius: '4px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', zIndex: 10
-            }
-          },
-            React.createElement('div', { style: { padding: '12px', fontSize: '10px', color: cv('--text-muted'), borderBottom: `1px solid ${cv('--border')}` } }, 'MI CUENTA'),
-            React.createElement('div', { 
-              onClick: () => { setSetupMode(false); setShowModal(true); }, // Inicia nuevo proyecto
-              style: { padding: '12px', cursor: 'pointer', fontSize: '12px', hover: { background: '#ff000011' } } 
-            }, '📁 MIS PROYECTOS'),
-            React.createElement('div', { 
-              onClick: () => signOut(auth),
-              style: { padding: '12px', cursor: 'pointer', fontSize: '12px', color: '#ff4444' } 
-            }, 'SALIR')
-          )
+        /* Botón de Usuario */
+        React.createElement(Btn, {
+          onClick: () => setShowUserMenu(!showUserMenu),
+          style: {
+            background: '#ff0000', border: 'none',
+            borderRadius: '4px', padding: '8px',
+            color: '#fff', display: 'flex', alignItems: 'center'
+          }
+        }, React.createElement(Icon, { name: 'user', size: 24 })),
+
+        /* Salir con Icono SVG */
+        React.createElement(Btn, {
+          onClick: () => signOut(auth),
+          style: {
+            background: cv('--surface2'), border: `1px solid ${cv('--border')}`,
+            borderRadius: '4px', padding: '10px 16px',
+            color: cv('--text-muted'), fontSize: '11px', letterSpacing: '1px',
+            display: 'flex', alignItems: 'center', gap: '8px'
+          }
+        }, 
+          React.createElement(Icon, { name: 'logout', size: 14 }),
+          'SALIR'
         )
       )
     ),
 
-    /* Feed Simple */
-    React.createElement('div', { className: 'feed-container' },
-      /* Input de Post */
+    /* Grid de Proyectos */
+    React.createElement('div', {
+      style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '20px' }
+    },
+      /* New project card */
       React.createElement('div', {
-        style: { 
-          background: cv('--surface2'), padding: '16px', borderRadius: '4px', 
-          marginBottom: '24px', border: `1px solid ${cv('--border')}` 
-        }
+        onClick: () => setShowModal(true),
+        className: 'fade-up',
+        style: {
+          border: `2px dashed ${cv('--border')}`,
+          borderRadius: '4px', padding: '44px 20px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', minHeight: '210px', gap: '14px', transition: 'all .2s'
+        },
+        onMouseEnter: e => { e.currentTarget.style.borderColor = '#ff0000'; e.currentTarget.style.background = 'rgba(255,0,0,0.05)'; },
+        onMouseLeave: e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.background = ''; }
       },
-        React.createElement('input', {
-          placeholder: '¿Qué estás diseñando?',
-          style: { 
-            width: '100%', background: 'none', border: 'none', color: cv('--text'),
-            outline: 'none', marginBottom: '12px'
+        React.createElement('div', {
+          style: {
+            width: '52px', height: '52px', borderRadius: '4px',
+            background: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center'
           }
-        }),
-        React.createElement('div', { style: { display: 'flex', justifyContent: 'flex-end' } },
-          React.createElement(Btn, { style: { background: '#ff0000', color: '#fff', padding: '6px 16px', borderRadius: '4px' } }, 'PUBLICAR')
-        )
+        }, React.createElement(Icon, { name: 'plus', size: 24 })),
+        React.createElement('span', {
+          style: { color: cv('--text-muted'), fontSize: '9px', letterSpacing: '4px' }
+        }, 'NUEVO DISEÑO')
       ),
 
-      /* Posts de ejemplo */
-      proyectos.length === 0 ? 
-        React.createElement('p', { style: { textAlign: 'center', color: cv('--text-muted') } }, 'No hay publicaciones aún...') :
-        proyectos.map(p => React.createElement('div', {
+      /* Lista de Proyectos */
+      ...proyectos.map((p, idx) =>
+        React.createElement('div', {
           key: p.id, className: 'fade-up',
-          style: { 
-            background: cv('--surface'), border: `1px solid ${cv('--border')}`,
-            padding: '20px', borderRadius: '4px', marginBottom: '16px'
+          style: {
+            background: cv('--card-bg'), border: `1px solid ${cv('--border')}`,
+            borderRadius: '4px', padding: '0 0 24px', position: 'relative', overflow: 'hidden'
           }
         },
-          React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' } },
-            React.createElement('div', { style: { width: '32px', height: '32px', background: '#333', borderRadius: '4px' } }),
-            React.createElement('span', { style: { fontWeight: '700', fontSize: '13px' } }, user?.displayName || 'Usuario')
-          ),
-          React.createElement('p', { style: { fontSize: '14px', marginBottom: '12px' } }, `He creado una nueva fuente: ${p.nombre}`),
-          /* Preview del diseño */
-          React.createElement('div', {
-            style: { 
-              height: '100px', background: cv('--bg2'), borderRadius: '4px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: `1px solid ${cv('--border')}`, color: '#ff0000', fontSize: '24px'
-            }
-          }, 'Aa')
-        ))
-    )
-  )
-);
-
-    /* ── New Project Modal ── */
-    showModal && React.createElement('div', {
-      style:{
-        position:'fixed', inset:0, background:'rgba(0,0,0,0.85)',
-        backdropFilter:'blur(16px)', zIndex:50,
-        display:'flex', alignItems:'center', justifyContent:'center', padding:'16px'
-      },
-      onClick: e => e.target === e.currentTarget && setShowModal(false)
-    },
-      React.createElement('div', {
-        className:'fade-up',
-        style:{
-          background: isDark ? '#0f1523' : '#fff',
-          border:`1px solid ${cv('--border')}`,
-          borderRadius:'28px', padding:'44px 40px', width:'100%', maxWidth:'440px',
-          boxShadow:'0 40px 100px rgba(0,0,0,0.5)'
-        }
-      },
-        React.createElement('h2', {
-          style:{
-            fontFamily:'"Press Start 2P",cursive', fontSize:'13px',
-            background: ACCENT, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
-            textAlign:'center', marginBottom:'32px', lineHeight:1.8
-          }
-        }, 'NUEVA FUENTE'),
-        /* Name input */
-        React.createElement('div', { style:{ marginBottom:'22px' }},
-          React.createElement('label', {
-            style:{ color: cv('--text-muted'), fontSize:'9px', letterSpacing:'3px', display:'block', marginBottom:'10px' }
-          }, 'NOMBRE'),
-          React.createElement('input', {
-            autoFocus: true, value: nuevoNombre,
-            onChange: e => setNuevoNombre(e.target.value),
-            onKeyDown: e => e.key === 'Enter' && confirmarNuevoProyecto(),
-            placeholder:'Mi fuente pixel...',
-            style:{
-              width:'100%', background: cv('--surface2'),
-              border:`1px solid ${cv('--border')}`, borderRadius:'14px',
-              padding:'14px 18px', color: cv('--text'), fontSize:'14px', outline:'none'
-            }
-          })
-        ),
-        /* Resolution */
-        React.createElement('div', { style:{ marginBottom:'32px' }},
-          React.createElement('label', {
-            style:{ color: cv('--text-muted'), fontSize:'9px', letterSpacing:'3px', display:'block', marginBottom:'10px' }
-          }, 'RESOLUCIÓN DEL GRID'),
-          React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'10px' }},
-            [8, 12, 16].map(s =>
+          React.createElement('div', { style: { height: '4px', background: '#ff0000' } }),
+          React.createElement('div', { style: { padding: '24px 24px 0' } },
+            React.createElement('h3', {
+              style: { fontSize: '14px', fontWeight: '700', marginBottom: '12px', color: cv('--text') }
+            }, p.nombre || 'Sin nombre'),
+            React.createElement('div', { style: { display: 'flex', gap: '8px', marginBottom: '20px' } },
+              React.createElement('span', {
+                style: { fontSize: '9px', padding: '4px 10px', borderRadius: '2px', background: 'rgba(255,0,0,0.1)', color: '#ff0000' }
+              }, `${p.gridSize}px`),
+              React.createElement('span', {
+                style: { fontSize: '9px', padding: '4px 10px', borderRadius: '2px', background: cv('--surface2'), color: cv('--text-muted'), display: 'flex', alignItems: 'center', gap: '4px' }
+              }, React.createElement(Icon, { name: 'projects', size: 10 }), `${Object.keys(p.font || {}).length} glifos`)
+            ),
+            React.createElement('div', { style: { display: 'flex', gap: '8px' } },
               React.createElement(Btn, {
-                key: s, onClick: () => setNuevoSize(s),
-                style:{
-                  padding:'16px', borderRadius:'14px', fontWeight:'700', fontSize:'12px',
-                  background: nuevoSize === s ? ACCENT_S : cv('--surface2'),
-                  border: nuevoSize === s ? 'none' : `1px solid ${cv('--border')}`,
-                  color: nuevoSize === s ? '#fff' : cv('--text-muted')
-                }
-              }, `${s}×${s}`)
+                onClick: () => abrirProyecto(p),
+                style: { flex: 1, padding: '12px', background: '#ff0000', borderRadius: '4px', color: '#fff', fontSize: '11px', fontWeight: '700' }
+              }, 'ABRIR'),
+              React.createElement(Btn, {
+                onClick: e => { e.stopPropagation(); eliminarProyecto(p.id); },
+                style: { width: '44px', background: 'rgba(255,0,0,0.05)', border: '1px solid rgba(255,0,0,0.2)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+              }, React.createElement(Icon, { name: 'delete', size: 16 }))
             )
           )
-        ),
-        React.createElement('div', { style:{ display:'flex', gap:'12px' }},
-          React.createElement(Btn, {
-            onClick: () => setShowModal(false),
-            style:{
-              flex:1, padding:'14px', background:'none',
-              border:`1px solid ${cv('--border')}`, borderRadius:'14px', color: cv('--text-muted'), fontSize:'12px'
-            }
-          }, 'CANCELAR'),
-          React.createElement(Btn, {
-            onClick: confirmarNuevoProyecto,
-            disabled: !nuevoNombre.trim() || isSaving,
-            style:{
-              flex:1, padding:'14px', background: ACCENT_S,
-              borderRadius:'14px', color:'#fff', fontWeight:'700', fontSize:'12px'
-            }
-          }, isSaving ? '...' : 'CREAR →')
         )
       )
     )
-  );
-
+  )
+);
+                                            
   /* ─────────────────────────────────────────
      ── EDITOR PRINCIPAL ──
   ───────────────────────────────────────── */
