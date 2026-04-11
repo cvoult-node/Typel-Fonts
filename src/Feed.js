@@ -2,7 +2,10 @@
 //  SOCIAL FEED — src/Feed.js
 // ─────────────────────────────────────────────
 import React from 'https://esm.sh/react@18.2.0';
-import { getAuth, signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+// Importamos la función con alias para evitar conflictos y el objeto auth desde tu configuración
+import { signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { auth } from '../firebase.js'; 
+
 import { ACCENT, R_CARD, R_BTN, FONT_MONO, FONT_PIXEL } from './constants.js';
 import { Btn, Icon, Overlay, Modal, Label } from './ui.js';
 
@@ -231,6 +234,15 @@ export function FeedPage({ user, isDark, toggleTheme, proyectos, onOpenProject, 
   const [showUserMenu, setShowUserMenu] = React.useState(false);
   const [showNewModal, setShowNewModal] = React.useState(false);
 
+  // Función corregida para cerrar sesión
+  const handleSignOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    }
+  };
+
   return React.createElement('div', {
     style: { minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' },
     onClick: () => { if (showUserMenu) setShowUserMenu(false); }
@@ -278,11 +290,11 @@ export function FeedPage({ user, isDark, toggleTheme, proyectos, onOpenProject, 
               }, (user?.displayName?.[0] || user?.email?.[0] || 'U').toUpperCase())
         ),
 
-    showUserMenu && React.createElement(UserMenu, {
-      user, isDark,
-      onClose: () => setShowUserMenu(false),
-      onSignOut: signOut
-    })
+        showUserMenu && React.createElement(UserMenu, {
+          user, isDark,
+          onClose: () => setShowUserMenu(false),
+          onSignOut: handleSignOut // Usamos la función local definida arriba
+        })
       )
     ),
 
