@@ -79,21 +79,20 @@ const Btn = ({ onClick, style, children, disabled, title, className = '' }) =>
   }, children);
 
 // Componente para cargar tus iconos SVG de Pixel Art
-const Icon = ({ name, size = 20, className = "" }) => {
-  return React.createElement('img', {
-    src: `./src/icons/${name}.svg`,
-    alt: name,
-    style: { 
-      width: `${size}px`, 
-      height: `${size}px`, 
-      imageRendering: 'pixelated', // Crucial para que no se vea borroso
-      display: 'block'
-    },
-    className: className,
-    // En caso de que el archivo no exista aún, mostramos un cuadro rojo temporal
-    onError: (e) => { e.target.src = 'https://placehold.co/24x24/ff0000/ffffff?text=X' }
-  });
-};
+const Icon = ({ name, size = 18, style = {} }) => React.createElement('img', {
+  src: `./src/icons/${name}.svg`,
+  style: { 
+    width: `${size}px`, 
+    height: `${size}px`, 
+    imageRendering: 'pixelated',
+    display: 'inline-block',
+    verticalAlign: 'middle',
+    // Este filtro hace que el icono tome el color del texto del padre
+    filter: isDark ? 'brightness(0) invert(1)' : 'none', 
+    ...style
+  },
+  onError: (e) => { e.target.style.display = 'none'; }
+});
 
 // ─────────────────────────────────────────────
 //  MAIN APP
