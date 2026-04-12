@@ -1,0 +1,84 @@
+/* ── shared.css — variables y estilos comunes ── */
+:root {
+  --bg:       #080b14;
+  --surface:  #111420;
+  --surface2: #1a1d2e;
+  --accent:   #e62222;
+  --accent2:  rgba(230,34,34,0.12);
+  --border:   rgba(255,255,255,0.08);
+  --border2:  rgba(255,255,255,0.15);
+  --text:     #ffffff;
+  --muted:    #888;
+  --muted2:   #555;
+  --mono:     'Space Mono', monospace;
+  --pixel:    'Press Start 2P', cursive;
+  --r-btn:    6px;
+  --r-card:   14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--mono); }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+/* ── Navbar ── */
+.navbar {
+  height: 52px; padding: 0 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,11,20,0.88);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 100;
+}
+.navbar-logo { font-family: var(--pixel); font-size: 11px; color: var(--accent); letter-spacing: 2px; text-decoration: none; }
+.navbar-links { display: flex; gap: 4px; align-items: center; }
+.nav-link {
+  font-size: 9px; letter-spacing: 2px; color: var(--muted);
+  padding: 7px 12px; border-radius: var(--r-btn);
+  text-decoration: none; transition: color .15s, background .15s;
+  font-family: var(--mono); cursor: pointer; border: none; background: none;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-link.active { color: var(--accent); }
+.nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--pixel); font-size: 9px; color: var(--accent);
+  background: var(--accent2); cursor: pointer; text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* ── Botones genéricos ── */
+.btn {
+  background: var(--accent); color: #fff; border: none;
+  border-radius: var(--r-btn); padding: 10px 18px;
+  font-family: var(--mono); font-weight: 700;
+  font-size: 10px; letter-spacing: 2px;
+  cursor: pointer; transition: opacity .15s;
+}
+.btn:hover { opacity: .85; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-ghost {
+  background: none; border: 1px solid var(--border2);
+  border-radius: var(--r-btn); padding: 9px 16px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 2px; color: var(--muted);
+  cursor: pointer; transition: border-color .15s, color .15s;
+}
+.btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+/* ── Loading ── */
+.loading-screen {
+  height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 18px;
+}
+.loading-text {
+  font-family: var(--pixel); font-size: 10px;
+  color: var(--accent); letter-spacing: 4px;
+  animation: cs-pulse 1.4s ease-in-out infinite;
+}
+.loading-bar { width: 160px; height: 2px; background: var(--accent); border-radius: 2px; }
+@keyframes cs-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.hidden { display: none !important; }

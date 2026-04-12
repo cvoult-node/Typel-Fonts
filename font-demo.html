@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeshelf — Demo de Fuente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/shared.css">
+  <style>
+    body { overflow-y: scroll; }
+    .page-wrap { max-width: 820px; margin: 0 auto; padding: 32px 16px 80px; }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .hero-accent { height: 4px; background: var(--accent); }
+    .hero-inner { padding: 28px 28px 24px; }
+    .hero-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .hero-author { display: flex; align-items: center; gap: 12px; }
+    .hero-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--pixel); font-size: 13px;
+      border: 2px solid var(--accent); flex-shrink: 0;
+    }
+    .hero-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .hero-meta { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
+    .hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      font-size: 8px; letter-spacing: 2px;
+      border: 1px solid var(--border2);
+      border-radius: 4px; padding: 5px 10px;
+      color: var(--muted);
+    }
+    .badge.accent { border-color: rgba(230,34,34,.4); color: var(--accent); }
+
+    /* ── Interactive preview ── */
+    .preview-section {
+      background: #070710;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .preview-label {
+      font-size: 9px; color: var(--muted);
+      letter-spacing: 3px; margin-bottom: 12px;
+    }
+    .preview-canvas-wrap {
+      min-height: 80px;
+      display: flex; align-items: center;
+      overflow-x: auto; overflow-y: hidden;
+      margin-bottom: 16px;
+    }
+    #preview-canvas { image-rendering: pixelated; }
+
+    .preview-controls {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+    .preview-input {
+      flex: 1; min-width: 160px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-btn);
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .preview-input:focus { border-color: var(--accent); }
+    .size-btns { display: flex; gap: 4px; }
+    .size-btn {
+      width: 32px; height: 32px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-btn);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .size-btn:hover, .size-btn.active {
+      border-color: var(--accent); color: var(--accent);
+    }
+    .color-btns { display: flex; gap: 4px; }
+    .color-btn {
+      width: 22px; height: 22px;
+      border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; transition: border-color .15s;
+    }
+    .color-btn.active { border-color: #fff; }
+
+    /* ── Glyph grid ── */
+    .section-title {
+      font-family: var(--pixel);
+      font-size: 9px; color: var(--muted);
+      letter-spacing: 3px; margin-bottom: 16px;
+    }
+    .glyphs-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .glyphs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+      gap: 12px;
+    }
+    .glyph-cell {
+      background: #0a0a0f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 8px 6px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .glyph-cell:hover { border-color: rgba(230,34,34,.4); }
+    .glyph-char {
+      font-size: 9px; color: var(--muted);
+      font-family: var(--mono); letter-spacing: 1px;
+    }
+
+    /* ── Info section ── */
+    .info-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .info-item { }
+    .info-key {
+      font-size: 8px; color: var(--muted);
+      letter-spacing: 3px; margin-bottom: 6px;
+    }
+    .info-val { font-size: 13px; font-weight: 700; }
+
+    /* ── Pangram section ── */
+    .pangram-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .pangram-canvas-wrap {
+      background: #070710;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    #pangram-canvas { image-rendering: pixelated; }
+
+    /* ── Back button ── */
+    .back-row { margin-bottom: 20px; }
+    .btn-back {
+      background: none; border: none;
+      color: var(--muted); font-family: var(--mono);
+      font-size: 10px; letter-spacing: 2px;
+      cursor: pointer; padding: 0;
+      transition: color .15s;
+    }
+    .btn-back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <div id="screen-loading" class="loading-screen">
+    <span class="loading-text">CARGANDO...</span>
+    <div class="loading-bar"></div>
+  </div>
+
+  <div id="screen-app" class="hidden">
+    <nav class="navbar">
+      <a href="social.html" class="navbar-logo">CODESHELF</a>
+      <div class="navbar-links">
+        <a href="social.html" class="nav-link">EXPLORAR</a>
+        <span class="nav-link" id="nav-proyectos" style="display:none">MIS FUENTES</span>
+        <a href="profile.html" class="nav-avatar" id="nav-avatar">?</a>
+      </div>
+    </nav>
+
+    <div class="page-wrap">
+      <div class="back-row">
+        <button class="btn-back" onclick="history.back()">← VOLVER</button>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-accent"></div>
+        <div class="hero-inner">
+          <div class="hero-top">
+            <div class="hero-author">
+              <div class="hero-avatar" id="hero-avatar">?</div>
+              <div>
+                <div class="hero-name" id="hero-name">—</div>
+                <div class="hero-meta" id="hero-meta">—</div>
+              </div>
+            </div>
+            <div class="hero-badges" id="hero-badges"></div>
+          </div>
+
+          <!-- Interactive preview -->
+          <div class="preview-section">
+            <p class="preview-label">PREVISUALIZACIÓN INTERACTIVA</p>
+            <div class="preview-canvas-wrap">
+              <canvas id="preview-canvas"></canvas>
+            </div>
+            <div class="preview-controls">
+              <input class="preview-input" id="preview-text" type="text"
+                     placeholder="Escribe aquí..." maxlength="60" value="HELLO WORLD">
+              <div class="size-btns">
+                <button class="size-btn" data-size="2">S</button>
+                <button class="size-btn active" data-size="4">M</button>
+                <button class="size-btn" data-size="6">L</button>
+                <button class="size-btn" data-size="8">XL</button>
+              </div>
+              <div class="color-btns">
+                <div class="color-btn active" data-color="#e62222" style="background:#e62222"></div>
+                <div class="color-btn" data-color="#ffffff" style="background:#ffffff"></div>
+                <div class="color-btn" data-color="#22e6a0" style="background:#22e6a0"></div>
+                <div class="color-btn" data-color="#e6cc22" style="background:#e6cc22"></div>
+                <div class="color-btn" data-color="#2278e6" style="background:#2278e6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="info-section">
+        <div class="section-title">INFORMACIÓN</div>
+        <div class="info-grid" id="info-grid"></div>
+      </div>
+
+      <!-- Todos los glifos -->
+      <div class="glyphs-section">
+        <div class="section-title">TODOS LOS GLIFOS</div>
+        <div class="glyphs-grid" id="glyphs-grid"></div>
+      </div>
+
+      <!-- Pangrama -->
+      <div class="pangram-section">
+        <div class="section-title">PANGRAMA</div>
+        <div class="pangram-canvas-wrap">
+          <canvas id="pangram-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, onAuthStateChanged } from './src/firebase.js';
+    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { renderTextOnCanvas, createGlyphGrid, countGlyphs, measureText } from './src/pixelRenderer.js';
+
+    const hide = id => document.getElementById(id).classList.add('hidden');
+    const show = id => document.getElementById(id).classList.remove('hidden');
+
+    const AVATAR_COLORS = ['#e62222','#2265e6','#22e662','#e6a022','#a022e6','#22e6cc'];
+    function avatarColor(str) {
+      let h = 0;
+      for (const c of (str||'?')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+      return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+    }
+    function formatDate(ts) {
+      if (!ts) return '—';
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
+    }
+
+    // ── Estado ───────────────────────────────────
+    let post       = null;
+    let pixelSize  = 4;
+    let fontColor  = '#e62222';
+
+    function drawPreview() {
+      if (!post) return;
+      const text   = document.getElementById('preview-text').value || ' ';
+      const canvas = document.getElementById('preview-canvas');
+      const gs     = post.gridSize || 8;
+      const ls     = 2;
+      const padX   = 16, padY = 12;
+      const w      = measureText(text.toUpperCase(), gs, pixelSize, ls) + padX * 2;
+      const h      = gs * pixelSize + padY * 2;
+      canvas.width  = Math.max(w, 10);
+      canvas.height = Math.max(h, 10);
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      renderTextOnCanvas(ctx, text, post.font || {}, gs, pixelSize, padX, padY, fontColor, ls);
+    }
+
+    function drawPangram() {
+      if (!post) return;
+      const text   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789';
+      const gs     = post.gridSize || 8;
+      const ps     = 3;
+      const ls     = 2;
+      const chars  = 13; // por línea
+      const lineH  = gs * ps + 8;
+      const lines  = [];
+      for (let i = 0; i < text.length; i += chars) lines.push(text.slice(i, i + chars));
+      const w = measureText(text.slice(0, chars), gs, ps, ls) + 32;
+      const h = lines.length * lineH + 24;
+      const canvas = document.getElementById('pangram-canvas');
+      canvas.width  = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
+      lines.forEach((line, i) => {
+        renderTextOnCanvas(ctx, line, post.font || {}, gs, ps, 16, 12 + i * lineH, fontColor, ls);
+      });
+    }
+
+    function renderGlyphs() {
+      if (!post) return;
+      const grid = document.getElementById('glyphs-grid');
+      grid.innerHTML = '';
+      const font = post.font || {};
+      const gs   = post.gridSize || 8;
+
+      // Orden: letras, números, símbolos
+      const order = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,:;!?-_/\\@#$%&()[]{}';
+      const keys  = [...new Set([...order, ...Object.keys(font)])];
+
+      keys.forEach(ch => {
+        const glyph = font[ch];
+        if (!glyph || !glyph.some(Boolean)) return;
+        const cell = document.createElement('div');
+        cell.className = 'glyph-cell';
+        cell.title = `Glifo: "${ch}"`;
+        cell.appendChild(createGlyphGrid(glyph, gs, 3, fontColor));
+        const label = document.createElement('span');
+        label.className = 'glyph-char';
+        label.textContent = ch === ' ' ? '[ ]' : ch;
+        cell.appendChild(label);
+        cell.onclick = () => {
+          const inp = document.getElementById('preview-text');
+          inp.value += ch;
+          drawPreview();
+        };
+        grid.appendChild(cell);
+      });
+    }
+
+    function initPost(p) {
+      post = p;
+      const gs         = p.gridSize || 8;
+      const glyphCount = countGlyphs(p.font);
+      const initial    = (p.autorNombre || p.autorEmail || '?')[0].toUpperCase();
+      const bgCol      = avatarColor(p.uid);
+
+      // Avatar
+      const avatarEl = document.getElementById('hero-avatar');
+      avatarEl.textContent = initial;
+      avatarEl.style.background = bgCol + '22';
+      avatarEl.style.borderColor = bgCol;
+      avatarEl.style.color = bgCol;
+
+      document.getElementById('hero-name').textContent = p.autorNombre || p.autorEmail || 'Anónimo';
+      document.getElementById('hero-meta').textContent = formatDate(p.publishedAt);
+      document.title = `${p.fontNombre || 'Fuente'} — Codeshelf`;
+
+      // Badges
+      const badges = document.getElementById('hero-badges');
+      badges.innerHTML = `
+        <span class="badge accent">${gs}PX</span>
+        <span class="badge">${glyphCount} GLIFOS</span>
+        <span class="badge">${p.fontNombre || 'Sin nombre'}</span>
+      `;
+
+      // Info grid
+      document.getElementById('info-grid').innerHTML = `
+        <div class="info-item">
+          <div class="info-key">NOMBRE</div>
+          <div class="info-val">${p.fontNombre || '—'}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">AUTOR</div>
+          <div class="info-val">${p.autorNombre || p.autorEmail || 'Anónimo'}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">TAMAÑO DE REJILLA</div>
+          <div class="info-val">${gs} × ${gs} PX</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">GLIFOS DEFINIDOS</div>
+          <div class="info-val">${glyphCount}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">PUBLICADO</div>
+          <div class="info-val">${formatDate(p.publishedAt)}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-key">BIO DEL AUTOR</div>
+          <div class="info-val" style="font-size:11px;font-weight:400;color:var(--muted);">${p.autorBio || '—'}</div>
+        </div>
+      `;
+
+      drawPreview();
+      drawPangram();
+      renderGlyphs();
+    }
+
+    // ── Controles ────────────────────────────────
+    document.getElementById('preview-text').oninput = drawPreview;
+
+    document.querySelectorAll('.size-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        pixelSize = parseInt(btn.dataset.size);
+        drawPreview();
+        drawPangram();
+      };
+    });
+
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        fontColor = btn.dataset.color;
+        drawPreview();
+        drawPangram();
+        renderGlyphs();
+      };
+    });
+
+    // ── Init ─────────────────────────────────────
+    onAuthStateChanged(auth, async (user) => {
+      hide('screen-loading');
+
+      if (user) {
+        const navProyectos = document.getElementById('nav-proyectos');
+        navProyectos.style.display = '';
+        navProyectos.onclick = () => window.location.href = 'feed.html';
+        try {
+          const perfil = await getDoc(doc(db, 'usuarios', user.uid, 'config', 'perfil'));
+          const nombre = perfil.exists() ? perfil.data().displayName : null;
+          document.getElementById('nav-avatar').textContent = (nombre || user.email || '?')[0].toUpperCase();
+        } catch { document.getElementById('nav-avatar').textContent = (user.email||'?')[0].toUpperCase(); }
+      }
+
+      // Leer post de sessionStorage
+      const raw = sessionStorage.getItem('demoPost');
+      if (!raw) { window.location.replace('social.html'); return; }
+
+      try {
+        const p = JSON.parse(raw);
+        show('screen-app');
+        initPost(p);
+      } catch {
+        window.location.replace('social.html');
+      }
+    });
+  </script>
+</body>
+</html>

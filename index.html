@@ -1,145 +1,105 @@
 <!DOCTYPE html>
-<html lang="es" class="light">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="src/favicon.svg">
-    <title>CodeShelf | Pixel Font Studio</title>
-    <meta name="description" content="Diseña, guarda y comparte tus propias tipografías pixel art." />
-    <meta name="theme-color" content="#ffffff" />
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeshelf — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080b14;--surface:#111420;--surface2:#1a1d2e;
+      --accent:#e62222;--border:rgba(255,255,255,0.1);
+      --text:#fff;--muted:#888;
+      --mono:'Space Mono',monospace;--pixel:'Press Start 2P',cursive;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .box{width:100%;max-width:380px;background:#0f0f0f;border:1px solid var(--border);border-radius:14px;padding:40px 36px;box-shadow:0 24px 60px rgba(0,0,0,0.6);}
+    .logo{text-align:center;margin-bottom:32px;}
+    .logo-text{font-family:var(--pixel);font-size:18px;color:var(--accent);line-height:2;letter-spacing:3px;}
+    .tagline{font-size:8px;letter-spacing:5px;color:var(--muted);margin-top:8px;}
+    .form{display:flex;flex-direction:column;gap:10px;}
+    input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 15px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .15s;}
+    input:focus{border-color:var(--accent);}
+    .btn-main{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:13px;font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:opacity .15s;}
+    .btn-main:hover{opacity:.85;}
+    .btn-main:disabled{opacity:.5;cursor:not-allowed;}
+    .divider{display:flex;align-items:center;gap:10px;margin:18px 0;}
+    .divider-line{flex:1;height:1px;background:var(--border);}
+    .divider-text{font-size:9px;letter-spacing:2px;color:var(--muted);}
+    .btn-google{width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:background .15s;}
+    .btn-google:hover{background:rgba(255,255,255,0.1);}
+    .error{color:var(--accent);font-size:10px;margin-top:12px;text-align:center;display:none;line-height:1.6;}
+    .loading{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+    .loading-text{font-family:var(--pixel);font-size:10px;color:var(--accent);letter-spacing:4px;animation:pulse 1.4s infinite;}
+    .loading-bar{width:160px;height:2px;background:var(--accent);border-radius:2px;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .hidden{display:none!important;}
+  </style>
+</head>
+<body>
+  <div id="screen-loading" class="loading">
+    <span class="loading-text">CARGANDO...</span>
+    <div class="loading-bar"></div>
+  </div>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
-
-    <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-      /* ─── LIGHT THEME (Default) ─── */
-      html.light {
-        --bg:          #ffffff;
-        --bg2:         #f5f5f5;
-        --surface:     #ffffff;
-        --surface2:    #f0f0f0;
-        --border:      #e0e0e0;
-        --text:        #1a1a1a;
-        --text-muted:  #666666;
-        --accent:      #ff0000;
-        --pixel:       #ff0000;
-        --empty:       #f9f9f9;
-        --grid-line:   #eeeeee;
-        --nav-bg:      rgba(255, 255, 255, 0.9);
-        --card-bg:     #ffffff;
-        --scrollbar:   #cccccc;
-      }
-
-      /* ─── DARK THEME ─── */
-      html.dark {
-        --bg:          #0a0a0a;
-        --bg2:         #111111;
-        --surface:     #161616;
-        --surface2:    #222222;
-        --border:      #333333;
-        --text:        #eeeeee;
-        --text-muted:  #888888;
-        --accent:      #ff0000;
-        --pixel:       #ff0000;
-        --empty:       #0d0d0d;
-        --grid-line:   #1a1a1a;
-        --nav-bg:      rgba(10, 10, 10, 0.9);
-        --card-bg:     #161616;
-        --scrollbar:   #333333;
-      }
-
-      body {
-        background-color: var(--bg);
-        background-image: radial-gradient(var(--border) 1px, transparent 1px);
-        background-size: 24px 24px;
-        color: var(--text);
-        font-family: 'Space Mono', monospace;
-        overflow-x: hidden;
-        user-select: none;
-        transition: background-color 0.2s, color 0.2s;
-      }
-
-      ::-webkit-scrollbar { width: 6px; height: 6px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
-
-      /* Ajuste de bordes: Menos redondeados, más profesionales */
-      button, input, select, .card, .panel, .modal-content {
-        border-radius: 4px; 
-      }
-
-      /* Animations */
-      @keyframes fadeUp   { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
-      @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.5} }
-      @keyframes spin     { to{transform:rotate(360deg)} }
-
-      .fade-up  { animation: fadeUp .3s ease both; }
-      .pulsing  { animation: pulse 2s infinite; }
-
-      /* Helpers */
-      button, [role="button"] { 
-        cursor: pointer; 
-        border: 1px solid var(--border);
-        transition: all 0.2s;
-      }
-      button:hover {
-        border-color: var(--accent);
-        transform: translateY(-1px);
-      }
-      
-      input { font-family: inherit; }
-
-      /* Pixel canvas container */
-      #canvas-wrap { 
-        image-rendering: pixelated; 
-        background: var(--grid-line);
-      }
-
-      /* Estilos para el Feed Social */
-      .feed-container {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        max-width: 600px;
-        margin: 0 auto;
-      }
-      
-      .post-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        padding: 16px;
-      }
-
-      /* Modal de exportación */
-      .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 100;
-      }
-      
-      .modal-content {
-        background: var(--bg);
-        border: 2px solid var(--accent);
-        padding: 24px;
-        width: 100%;
-        max-width: 400px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/App.js"></script>
-    <noscript>
-      <div style="text-align:center;padding:60px;font-family:monospace">
-        Necesitas JavaScript para usar CodeShelf.
+  <div id="screen-auth" class="hidden" style="width:100%;display:flex;align-items:center;justify-content:center;">
+    <div class="box">
+      <div class="logo">
+        <div class="logo-text">CODE<br>SHELF</div>
+        <p class="tagline">PIXEL FONT STUDIO</p>
       </div>
-    </noscript>
-  </body>
+      <form class="form" id="auth-form">
+        <input type="email"    id="inp-email"    placeholder="Email" autocomplete="email" required>
+        <input type="password" id="inp-password" placeholder="Contraseña" autocomplete="current-password" required>
+        <button type="submit" class="btn-main" id="btn-submit">ENTRAR / REGISTRAR</button>
+      </form>
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">O</span>
+        <div class="divider-line"></div>
+      </div>
+      <button class="btn-google" id="btn-google">🔑&nbsp;&nbsp;Continuar con Google</button>
+      <p class="error" id="auth-error"></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, provider, signInWithPopup, onAuthStateChanged,
+             signInWithEmailAndPassword, createUserWithEmailAndPassword
+           } from './src/firebase.js';
+
+    const hide = id => document.getElementById(id).classList.add('hidden');
+    const show = id => document.getElementById(id).classList.remove('hidden');
+
+    onAuthStateChanged(auth, u => {
+      hide('screen-loading');
+      if (u) { window.location.replace('social.html'); return; }
+      show('screen-auth');
+    });
+
+    const showError = msg => {
+      const el = document.getElementById('auth-error');
+      el.textContent = msg; el.style.display = 'block';
+    };
+
+    document.getElementById('auth-form').onsubmit = async e => {
+      e.preventDefault();
+      const email = document.getElementById('inp-email').value.trim();
+      const pass  = document.getElementById('inp-password').value;
+      const btn   = document.getElementById('btn-submit');
+      btn.disabled = true; btn.textContent = '...';
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch {
+        try { await createUserWithEmailAndPassword(auth, email, pass); }
+        catch (err) { showError(err.message); }
+      }
+      btn.disabled = false; btn.textContent = 'ENTRAR / REGISTRAR';
+    };
+
+    document.getElementById('btn-google').onclick = () =>
+      signInWithPopup(auth, provider).catch(err => showError(err.message));
+  </script>
+</body>
 </html>
