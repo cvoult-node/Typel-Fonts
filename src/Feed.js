@@ -1,6 +1,7 @@
-import { auth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { db, doc, deleteDoc } from './firebase.js';
 
+import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { auth, db } from './firebase.js'; 
+import { doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 /**
  * RENDERIZA LA LISTA DE PROYECTOS
  */
