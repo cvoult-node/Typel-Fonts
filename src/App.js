@@ -12,8 +12,8 @@ import {
 
 import { ACCENT, FONT_MONO, FONT_PIXEL } from './constants.js';
 import { Btn }                           from './ui.js';
+import { renderFeed } from './Feed.js';
 import { floodFill, shiftGrid }          from './canvas.js';
-import { FeedPage }                      from './Feed.js';
 import { EditorPage }                    from './Editor.js';
 
 // Exponer opentype globalmente para canvas.js
