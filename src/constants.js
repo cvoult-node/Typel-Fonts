@@ -1,10 +1,10 @@
 // ─────────────────────────────────────────────
-//  CONSTANTS — src/constants.js
+//  CONSTANTS — src/constants.js  (paleta renovada)
 // ─────────────────────────────────────────────
 
-export const ACCENT   = '#e62222';
-export const ACCENT_D = '#ff3333'; // un poco más brillante en dark
-export const RED_MUTE = 'rgba(230,34,34,0.10)';
+export const ACCENT   = '#bf4545';          // wine-red apagado
+export const ACCENT_H = '#d45555';          // hover
+export const RED_MUTE = 'rgba(191,69,69,0.09)';
 
 export const TECLADO = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N','Ñ',
@@ -15,9 +15,8 @@ export const TECLADO = [
   ' ',',','.',':',';','!','?'
 ];
 
-// Radios de borde — dos tipos: suave (tarjetas) y duro (botones / inputs)
-export const R_CARD = '14px';  // tarjetas, paneles
-export const R_BTN  = '6px';   // botones, inputs, badges
+export const R_CARD = '14px';
+export const R_BTN  = '7px';
 
-export const FONT_MONO = "'IBM Plex Mono', 'Space Mono', monospace";
+export const FONT_MONO  = "'Space Mono', monospace";
 export const FONT_PIXEL = '"Press Start 2P", cursive';

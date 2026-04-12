@@ -7,190 +7,218 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/shared.css">
   <style>
-    :root {
-      --bg:          #080b14;
-      --surface:     #111420;
-      --surface2:    #1a1d2e;
-      --accent:      #e62222;
-      --border:      rgba(255,255,255,0.1);
-      --text:        #ffffff;
-      --text-muted:  #888;
-      --radius-btn:  6px;
-      --radius-card: 14px;
-      --font-mono:   'Space Mono', monospace;
-      --font-pixel:  'Press Start 2P', cursive;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-mono);
       overflow-y: scroll;
       min-height: 100vh;
+      background-image: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(191,69,69,0.05) 0%, transparent 70%);
     }
 
-    /* ── Navbar ── */
-    .navbar {
-      height: 52px;
-      padding: 0 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      background: rgba(8,11,20,0.85);
-      backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* ── Feed ── */
+    .feed-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 28px 16px 80px;
     }
-    .logo {
-      font-family: var(--font-pixel);
-      font-size: 11px;
-      color: var(--accent);
+
+    .feed-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+    .feed-title {
+      font-family: var(--pixel);
+      font-size: 10px;
+      color: var(--text);
       letter-spacing: 2px;
     }
-    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .feed-count {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
+
+    /* ── Nav extra ── */
     .avatar-circle {
-      width: 34px; height: 34px;
+      width: 32px; height: 32px;
       border-radius: 50%;
-      border: 2px solid var(--accent);
-      background: rgba(230,34,34,0.1);
+      border: 1.5px solid var(--accent);
+      background: var(--accent2);
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-pixel);
+      font-family: var(--pixel);
       font-size: 9px;
       color: var(--accent);
+      transition: background .15s;
     }
+    .avatar-circle:hover { background: rgba(191,69,69,0.18); }
+
     .btn-logout {
       background: none;
       border: 1px solid var(--border);
-      border-radius: var(--radius-btn);
-      color: var(--text-muted);
-      font-family: var(--font-mono);
+      border-radius: var(--r-btn);
+      color: var(--muted);
+      font-family: var(--mono);
       font-size: 9px;
       letter-spacing: 2px;
       padding: 6px 12px;
       cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
+      transition: border-color .15s, color .15s;
     }
     .btn-logout:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── Feed ── */
-    .feed-container {
-      max-width: 620px;
-      margin: 0 auto;
-      padding: 24px 16px;
-    }
-
-    /* ── New project button ── */
+    /* ── New project btn ── */
     .new-project-btn {
-      border: 2px dashed var(--border);
-      border-radius: var(--radius-card);
+      border: 1px dashed var(--border2);
+      border-radius: var(--r-card);
       padding: 18px 20px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
       cursor: pointer;
-      margin-bottom: 20px;
-      transition: border-color 0.15s, background 0.15s;
+      margin-bottom: 18px;
+      transition: border-color .18s, background .18s, transform .12s;
       background: none;
       width: 100%;
       text-align: left;
       color: var(--text);
-      font-family: var(--font-mono);
+      font-family: var(--mono);
     }
     .new-project-btn:hover {
       border-color: var(--accent);
-      background: rgba(230,34,34,0.03);
+      background: var(--accent3);
+      transform: translateY(-1px);
     }
+
     .plus-square {
       width: 38px; height: 38px;
       background: var(--accent);
-      border-radius: var(--radius-btn);
+      border-radius: var(--r-btn);
       display: flex; align-items: center; justify-content: center;
-      font-weight: bold; font-size: 22px;
+      font-weight: bold; font-size: 20px;
       flex-shrink: 0;
       color: #fff;
+      transition: background .15s;
+    }
+    .new-project-btn:hover .plus-square { background: var(--accent-h); }
+
+    .new-project-sub {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: 0.5px;
     }
 
     /* ── Cards ── */
     #projects-list {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
+
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-card);
+      border-radius: var(--r-card);
       overflow: hidden;
-      transition: border-color 0.15s;
+      transition: border-color .18s, transform .15s, box-shadow .18s;
+      box-shadow: var(--shadow-card);
     }
-    .card:hover { border-color: rgba(230,34,34,0.3); }
-    .card-top-line { height: 3px; background: var(--accent); }
+    .card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-top-line {
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
     .card-inner { padding: 18px; }
+
     .card-header {
-      display: flex; align-items: center;
-      gap: 12px; margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
     }
+
     .card-icon {
       width: 38px; height: 38px;
-      background: rgba(230,34,34,0.12);
+      background: var(--accent2);
       border-radius: 50%;
+      border: 1px solid var(--border-accent);
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-pixel);
+      font-family: var(--pixel);
       font-size: 11px;
       color: var(--accent);
       flex-shrink: 0;
     }
-    .p-title { font-weight: 700; font-size: 13px; }
-    .p-meta  { font-size: 9px; color: var(--text-muted); letter-spacing: 2px; margin-top: 3px; }
+
+    .p-title { font-weight: 700; font-size: 13px; color: var(--text); }
+    .p-meta  {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
     .card-preview {
-      background: #0d0d0d;
-      border-radius: var(--radius-btn);
-      padding: 12px;
+      background: #080610;
+      border-radius: var(--r-btn);
+      padding: 14px;
       margin-bottom: 14px;
       display: flex;
-      gap: 8px;
+      gap: 10px;
       min-height: 44px;
       align-items: center;
       justify-content: center;
+      border: 1px solid var(--border);
     }
+
     .card-actions { display: flex; gap: 8px; }
+
     .btn-open {
       flex: 1;
       background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: var(--radius-btn);
+      border-radius: var(--r-btn);
       padding: 10px;
-      font-family: var(--font-mono);
+      font-family: var(--mono);
       font-weight: 700;
       font-size: 10px;
       letter-spacing: 2px;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: background .15s, transform .12s;
     }
-    .btn-open:hover { opacity: 0.85; }
+    .btn-open:hover { background: var(--accent-h); transform: translateY(-1px); }
+
     .btn-del {
       width: 40px;
-      background: rgba(230,34,34,0.06);
-      border: 1px solid rgba(230,34,34,0.18);
-      border-radius: var(--radius-btn);
-      color: var(--accent);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--r-btn);
+      color: var(--muted2);
       cursor: pointer;
-      font-weight: bold;
       font-size: 18px;
-      transition: background 0.15s;
+      transition: background .15s, border-color .15s, color .15s;
+      display: flex; align-items: center; justify-content: center;
     }
-    .btn-del:hover { background: rgba(230,34,34,0.15); }
+    .btn-del:hover {
+      background: rgba(191,69,69,0.08);
+      border-color: var(--border-accent);
+      color: var(--accent);
+    }
 
     /* ── Empty state ── */
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
+      padding: 70px 20px;
+      color: var(--muted);
       font-size: 10px;
       letter-spacing: 3px;
     }
@@ -198,197 +226,175 @@
       display: block;
       font-size: 32px;
       margin-bottom: 16px;
-      opacity: 0.4;
+      opacity: 0.3;
     }
 
     /* ── Modal ── */
     .modal-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0,0,0,0.72);
       display: flex; align-items: center; justify-content: center;
       z-index: 999;
       padding: 16px;
+      backdrop-filter: blur(8px);
     }
     .modal-overlay.hidden { display: none; }
+
     .modal-box {
-      background: #0f1020;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-card);
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-card);
       padding: 32px 28px;
       width: 100%;
-      max-width: 360px;
+      max-width: 340px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
     }
+
     .modal-title {
-      font-family: var(--font-pixel);
-      font-size: 12px;
+      font-family: var(--pixel);
+      font-size: 11px;
       color: var(--accent);
       margin-bottom: 8px;
+      letter-spacing: 2px;
     }
     .modal-subtitle {
       font-size: 10px;
-      color: var(--text-muted);
+      color: var(--muted);
       letter-spacing: 1px;
       margin-bottom: 24px;
     }
+
     .modal-input {
       width: 100%;
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: var(--radius-btn);
+      border-radius: var(--r-btn);
       padding: 12px 14px;
       color: var(--text);
-      font-family: var(--font-mono);
+      font-family: var(--mono);
       font-size: 13px;
       outline: none;
       margin-bottom: 8px;
-      transition: border-color 0.15s;
+      transition: border-color .15s, background .15s;
     }
-    .modal-input:focus { border-color: var(--accent); }
+    .modal-input:focus {
+      border-color: var(--accent);
+      background: var(--surface3);
+    }
+    .modal-input::placeholder { color: var(--muted); }
+
     .modal-hint {
       font-size: 9px;
-      color: var(--text-muted);
+      color: var(--muted2);
       letter-spacing: 1px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
+
     .modal-actions { display: flex; gap: 8px; }
+
     .btn-cancel {
       flex: 1;
       background: none;
       border: 1px solid var(--border);
-      border-radius: var(--radius-btn);
-      color: var(--text-muted);
-      font-family: var(--font-mono);
+      border-radius: var(--r-btn);
+      color: var(--muted);
+      font-family: var(--mono);
       font-size: 10px;
       letter-spacing: 2px;
       padding: 11px;
       cursor: pointer;
-      transition: border-color 0.15s;
+      transition: border-color .15s, color .15s;
     }
-    .btn-cancel:hover { border-color: var(--text-muted); }
+    .btn-cancel:hover { border-color: var(--border2); color: var(--text); }
+
     .btn-confirm {
       flex: 2;
       background: var(--accent);
       border: none;
-      border-radius: var(--radius-btn);
+      border-radius: var(--r-btn);
       color: #fff;
-      font-family: var(--font-mono);
+      font-family: var(--mono);
       font-weight: 700;
       font-size: 10px;
       letter-spacing: 2px;
       padding: 11px;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: background .15s, transform .12s;
     }
-    .btn-confirm:hover { opacity: 0.85; }
-    .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-confirm:hover { background: var(--accent-h); transform: translateY(-1px); }
+    .btn-confirm:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    /* ── Loading ── */
-    .loading-screen {
-      height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 18px;
-    }
-    .loading-text {
-      font-family: var(--font-pixel);
-      font-size: 10px;
-      color: var(--accent);
-      letter-spacing: 4px;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    .loading-bar {
-      width: 160px; height: 2px;
-      background: var(--accent);
-      border-radius: 2px;
-    }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-    /* ── Auth form ── */
+    /* ── Auth form (fallback) ── */
     .auth-screen {
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
       padding: 16px;
     }
     .auth-box {
-      width: 100%; max-width: 380px;
-      background: #0f0f0f;
+      width: 100%; max-width: 360px;
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-card);
-      padding: 40px 36px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      border-radius: var(--r-card);
+      padding: 44px 36px 40px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
     }
-    .auth-logo {
-      text-align: center;
-      margin-bottom: 32px;
-    }
+    .auth-logo { text-align: center; margin-bottom: 36px; }
     .auth-logo-text {
-      font-family: var(--font-pixel);
-      font-size: 18px;
+      font-family: var(--pixel);
+      font-size: 16px;
       color: var(--accent);
       line-height: 2;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
     }
     .auth-tagline {
-      font-size: 8px;
+      font-size: 7px;
       letter-spacing: 5px;
-      color: var(--text-muted);
-      margin-top: 8px;
-      font-family: var(--font-mono);
+      color: var(--muted);
+      margin-top: 10px;
     }
     .auth-form { display: flex; flex-direction: column; gap: 10px; }
     .auth-input {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: var(--radius-btn);
-      padding: 12px 15px;
+      border-radius: var(--r-btn);
+      padding: 13px 15px;
       color: var(--text);
-      font-family: var(--font-mono);
+      font-family: var(--mono);
       font-size: 13px;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color .15s;
+      width: 100%;
     }
     .auth-input:focus { border-color: var(--accent); }
+    .auth-input::placeholder { color: var(--muted); }
     .btn-auth {
       background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: var(--radius-btn);
-      padding: 13px;
-      font-family: var(--font-mono);
+      border-radius: var(--r-btn);
+      padding: 14px;
+      font-family: var(--mono);
       font-weight: 700;
-      font-size: 11px;
-      letter-spacing: 2px;
+      font-size: 10px;
+      letter-spacing: 2.5px;
       cursor: pointer;
-      margin-top: 4px;
-      transition: opacity 0.15s;
+      margin-top: 6px;
+      transition: background .15s;
     }
-    .btn-auth:hover { opacity: 0.85; }
-    .auth-divider {
-      display: flex; align-items: center;
-      gap: 10px; margin: 18px 0;
-    }
+    .btn-auth:hover { background: var(--accent-h); }
+    .auth-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0; }
     .auth-divider-line { flex: 1; height: 1px; background: var(--border); }
-    .auth-divider-text {
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-    }
+    .auth-divider-text { font-size: 9px; letter-spacing: 2px; color: var(--muted); }
     .btn-google {
-      width: 100%; padding: 12px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-btn);
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
+      width: 100%; padding: 13px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-btn);
+      color: var(--text); font-family: var(--mono);
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      transition: background .15s;
     }
-    .btn-google:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
-
-    .hidden { display: none !important; }
+    .btn-google:hover { background: var(--surface3); }
   </style>
 </head>
 <body>
@@ -417,28 +423,35 @@
         <div class="auth-divider-line"></div>
       </div>
       <button class="btn-google" id="btn-google">🔑&nbsp;&nbsp;Continuar con Google</button>
-      <p id="auth-error" style="color:var(--accent);font-size:10px;margin-top:14px;text-align:center;display:none;"></p>
+      <p id="auth-error" style="color:var(--accent);font-size:9px;margin-top:14px;text-align:center;display:none;letter-spacing:1px;"></p>
     </div>
   </div>
 
   <!-- ── App screen ── -->
   <div id="screen-app" class="hidden">
     <nav class="navbar">
-      <span class="logo">CODESHELF</span>
-      <div class="nav-right">
+      <span class="navbar-logo" style="cursor:default;">CODESHELF</span>
+      <div class="navbar-links">
+        <a href="social.html" class="nav-link">EXPLORAR</a>
         <button class="btn-logout" id="btn-logout">SALIR</button>
         <div class="avatar-circle" id="avatar">U</div>
       </div>
     </nav>
 
     <main class="feed-container">
+      <div class="feed-header">
+        <span class="feed-title">MIS FUENTES</span>
+        <span class="feed-count" id="proj-count"></span>
+      </div>
+
       <button class="new-project-btn" id="btn-new-font">
         <div class="plus-square">+</div>
         <div>
-          <p style="font-weight:700;font-size:13px;">Nueva fuente</p>
-          <p style="font-size:10px;color:var(--text-muted);margin-top:3px;">Crea un nuevo proyecto de pixel font</p>
+          <p style="font-weight:700;font-size:13px;color:var(--text);">Nueva fuente</p>
+          <p class="new-project-sub">Crea un nuevo proyecto de pixel font</p>
         </div>
       </button>
+
       <div id="projects-list"></div>
     </main>
   </div>
@@ -448,7 +461,8 @@
     <div class="modal-box">
       <p class="modal-title">NUEVA FUENTE</p>
       <p class="modal-subtitle">Ponle un nombre a tu proyecto</p>
-      <input class="modal-input" type="text" id="new-font-name" placeholder="mi-fuente-pixel" maxlength="40">
+      <input class="modal-input" type="text" id="new-font-name"
+             placeholder="mi-fuente-pixel" maxlength="40">
       <p class="modal-hint">Solo letras, números y guiones</p>
       <div class="modal-actions">
         <button class="btn-cancel" id="close-modal">CANCELAR</button>
@@ -487,52 +501,46 @@
     } from './src/firebase.js';
     import { renderFeed, initFeedEvents } from './src/Feed.js';
 
-    // ── helpers ──────────────────────────────────
     const show = id => document.getElementById(id).classList.remove('hidden');
     const hide = id => document.getElementById(id).classList.add('hidden');
 
-    // ── cargar proyectos ─────────────────────────
     async function cargarProyectos(user) {
       const q   = query(collection(db, 'usuarios', user.uid, 'proyectos'), orderBy('updatedAt', 'desc'));
       const snp = await getDocs(q);
       return snp.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    // ── callbacks para Feed.js ───────────────────
     function makeCallbacks(user) {
       const onOpen = (proyecto) => {
         sessionStorage.setItem('proyectoActivo', JSON.stringify(proyecto));
         window.location.href = 'editor.html';
       };
-
       const onDelete = async (id) => {
         await deleteDoc(doc(db, 'usuarios', user.uid, 'proyectos', id));
-        const proyectos = await cargarProyectos(user);
-        renderFeed(proyectos, onOpen, onDelete);
+        const p = await cargarProyectos(user);
+        renderFeed(p, onOpen, onDelete);
+        updateCount(p.length);
       };
-
       const onCreate = async (nombre, size) => {
         const id   = Date.now().toString();
         const ref  = doc(db, 'usuarios', user.uid, 'proyectos', id);
-        const data = { nombre, gridSize: size, font: {}, updatedAt: new Date() };
-        await setDoc(ref, data);
-        const proyectos = await cargarProyectos(user);
-        renderFeed(proyectos, onOpen, onDelete);
+        await setDoc(ref, { nombre, gridSize: size, font: {}, updatedAt: new Date() });
+        const p = await cargarProyectos(user);
+        renderFeed(p, onOpen, onDelete);
+        updateCount(p.length);
       };
-
       return { onOpen, onDelete, onCreate };
     }
 
-    // ── auth state ───────────────────────────────
+    function updateCount(n) {
+      const el = document.getElementById('proj-count');
+      if (el) el.textContent = `${n} PROYECTO${n !== 1 ? 'S' : ''}`;
+    }
+
     onAuthStateChanged(auth, async (user) => {
       hide('screen-loading');
+      if (!user) { show('screen-auth'); return; }
 
-      if (!user) {
-        show('screen-auth');
-        return;
-      }
-
-      // Mostrar inicial del usuario en avatar
       const avatar = document.getElementById('avatar');
       if (avatar && user.email) avatar.textContent = user.email[0].toUpperCase();
 
@@ -541,14 +549,13 @@
       const { onOpen, onDelete, onCreate } = makeCallbacks(user);
       const proyectos = await cargarProyectos(user);
       renderFeed(proyectos, onOpen, onDelete);
+      updateCount(proyectos.length);
       initFeedEvents(onCreate);
 
-      // Logout
       document.getElementById('btn-logout').onclick = () =>
         signOut(auth).then(() => window.location.reload());
     });
 
-    // ── auth form ────────────────────────────────
     document.getElementById('auth-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email    = document.getElementById('auth-email').value.trim();
@@ -558,20 +565,15 @@
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch {
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-        } catch (err) {
-          errEl.textContent = err.message;
-          errEl.style.display = 'block';
-        }
+        try { await createUserWithEmailAndPassword(auth, email, password); }
+        catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
       }
     });
 
     document.getElementById('btn-google').onclick = () =>
       signInWithPopup(auth, provider).catch(err => {
         const errEl = document.getElementById('auth-error');
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
+        errEl.textContent = err.message; errEl.style.display = 'block';
       });
   </script>
 </body>

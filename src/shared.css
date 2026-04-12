@@ -1,84 +1,214 @@
-/* ── shared.css — variables y estilos comunes ── */
+/* ── shared.css — sistema de diseño renovado ── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&display=swap');
+
 :root {
-  --bg:       #080b14;
-  --surface:  #111420;
-  --surface2: #1a1d2e;
-  --accent:   #e62222;
-  --accent2:  rgba(230,34,34,0.12);
-  --border:   rgba(255,255,255,0.08);
-  --border2:  rgba(255,255,255,0.15);
-  --text:     #ffffff;
-  --muted:    #888;
-  --muted2:   #555;
+  /* ── Fondos ── */
+  --bg:       #0a0810;          /* negro-púrpura profundo      */
+  --surface:  #110f1c;          /* superficie primaria         */
+  --surface2: #1c1a2a;          /* superficie secundaria       */
+  --surface3: #252336;          /* inputs, hover states        */
+
+  /* ── Acento ── muted wine-red, no el rojo agresivo viejo */
+  --accent:   #bf4545;
+  --accent-h: #d45555;          /* hover del acento            */
+  --accent2:  rgba(191,69,69,0.10);
+  --accent3:  rgba(191,69,69,0.04);
+
+  /* ── Bordes — con tono lavanda sutil ── */
+  --border:   rgba(200,185,230,0.07);
+  --border2:  rgba(200,185,230,0.14);
+  --border-accent: rgba(191,69,69,0.28);
+
+  /* ── Texto ── */
+  --text:     #eae5f5;          /* blanco cálido con toque lila */
+  --muted:    #7e7894;          /* gris-lavanda                 */
+  --muted2:   #4e4b63;          /* más apagado                  */
+
+  /* ── Navbar ── */
+  --nav-bg:   rgba(10,8,16,0.88);
+
+  /* ── Tipografía ── */
   --mono:     'Space Mono', monospace;
   --pixel:    'Press Start 2P', cursive;
-  --r-btn:    6px;
+
+  /* ── Radios ── */
+  --r-btn:    7px;
   --r-card:   14px;
+
+  /* ── Sombras ── */
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-hover: 0 8px 32px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
 }
+
+/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: var(--bg); color: var(--text); font-family: var(--mono); }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar refinada ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(200,185,230,0.12);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(200,185,230,0.22);
+}
 
-/* ── Navbar ── */
+/* ═══════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════ */
 .navbar {
-  height: 52px; padding: 0 20px;
-  display: flex; justify-content: space-between; align-items: center;
+  height: 52px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid var(--border);
-  background: rgba(8,11,20,0.88);
-  backdrop-filter: blur(12px);
-  position: sticky; top: 0; z-index: 100;
+  background: var(--nav-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-.navbar-logo { font-family: var(--pixel); font-size: 11px; color: var(--accent); letter-spacing: 2px; text-decoration: none; }
-.navbar-links { display: flex; gap: 4px; align-items: center; }
+
+.navbar-logo {
+  font-family: var(--pixel);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-decoration: none;
+  opacity: 0.95;
+  transition: opacity .15s;
+}
+.navbar-logo:hover { opacity: 1; }
+
+.navbar-links {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
 .nav-link {
-  font-size: 9px; letter-spacing: 2px; color: var(--muted);
-  padding: 7px 12px; border-radius: var(--r-btn);
-  text-decoration: none; transition: color .15s, background .15s;
-  font-family: var(--mono); cursor: pointer; border: none; background: none;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  padding: 7px 12px;
+  border-radius: var(--r-btn);
+  text-decoration: none;
+  transition: color .15s, background .15s;
+  font-family: var(--mono);
+  cursor: pointer;
+  border: none;
+  background: none;
 }
-.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-link:hover {
+  color: var(--text);
+  background: rgba(200,185,230,0.06);
+}
 .nav-link.active { color: var(--accent); }
+
 .nav-avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  border: 2px solid var(--accent);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--pixel); font-size: 9px; color: var(--accent);
-  background: var(--accent2); cursor: pointer; text-decoration: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--pixel);
+  font-size: 9px;
+  color: var(--accent);
+  background: var(--accent2);
+  cursor: pointer;
+  text-decoration: none;
   flex-shrink: 0;
+  transition: border-color .15s, background .15s;
+}
+.nav-avatar:hover {
+  background: rgba(191,69,69,0.16);
+  border-color: var(--accent-h);
 }
 
-/* ── Botones genéricos ── */
+/* ═══════════════════════════════════════════
+   BOTONES
+═══════════════════════════════════════════ */
 .btn {
-  background: var(--accent); color: #fff; border: none;
-  border-radius: var(--r-btn); padding: 10px 18px;
-  font-family: var(--mono); font-weight: 700;
-  font-size: 10px; letter-spacing: 2px;
-  cursor: pointer; transition: opacity .15s;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-btn);
+  padding: 10px 18px;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background .15s, transform .12s;
 }
-.btn:hover { opacity: .85; }
-.btn:disabled { opacity: .45; cursor: not-allowed; }
-.btn-ghost {
-  background: none; border: 1px solid var(--border2);
-  border-radius: var(--r-btn); padding: 9px 16px;
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 2px; color: var(--muted);
-  cursor: pointer; transition: border-color .15s, color .15s;
+.btn:hover {
+  background: var(--accent-h);
+  transform: translateY(-1px);
 }
-.btn-ghost:hover { border-color: var(--text); color: var(--text); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
 
-/* ── Loading ── */
-.loading-screen {
-  height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 18px;
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border2);
+  border-radius: var(--r-btn);
+  padding: 9px 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
 }
+.btn-ghost:hover {
+  border-color: var(--text);
+  color: var(--text);
+  background: rgba(200,185,230,0.04);
+}
+
+/* ═══════════════════════════════════════════
+   LOADING
+═══════════════════════════════════════════ */
+.loading-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
 .loading-text {
-  font-family: var(--pixel); font-size: 10px;
-  color: var(--accent); letter-spacing: 4px;
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 4px;
   animation: cs-pulse 1.4s ease-in-out infinite;
 }
-.loading-bar { width: 160px; height: 2px; background: var(--accent); border-radius: 2px; }
-@keyframes cs-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
+.loading-bar {
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  border-radius: 1px;
+  animation: cs-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes cs-pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ═══════════════════════════════════════════
+   UTILIDADES
+═══════════════════════════════════════════ */
 .hidden { display: none !important; }
