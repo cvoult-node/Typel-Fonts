@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────
 //  App.js  —  Editor React
-//  Lee el proyecto activo de sessionStorage.
-//  Si no hay proyecto, redirige a feed.html.
+//  Lee proyecto de sessionStorage DESPUÉS de
+//  confirmar auth. Un solo punto de redirección.
 // ─────────────────────────────────────────────
 import React, { useState, useEffect, useRef, useCallback } from 'https://esm.sh/react@18.2.0';
 import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
@@ -13,11 +13,9 @@ import {
 } from './firebase.js';
 
 import { ACCENT, FONT_MONO, FONT_PIXEL } from './constants.js';
-import { Btn }                           from './ui.js';
 import { floodFill, shiftGrid }          from './canvas.js';
 import { EditorPage }                    from './Editor.js';
 
-// Exponer opentype globalmente para canvas.js
 window.__opentype__ = opentype;
 
 // ─────────────────────────────────────────────
@@ -30,63 +28,73 @@ function App() {
   const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
   useEffect(() => { document.documentElement.className = theme; }, [theme]);
 
-  // ── Auth ────────────────────────────────────
-  const [user,    setUser]    = useState(null);
-  const [loading, setLoading] = useState(true);
+  // ── Estado global ───────────────────────────
+  // 'loading' | 'ready' | 'error'
+  const [status,   setStatus]   = useState('loading');
+  const [user,     setUser]     = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  // ── Proyecto (desde sessionStorage) ─────────
+  // ── Proyecto ────────────────────────────────
   const [proyectoActivo, setProyectoActivo] = useState(null);
   const [proyectoNombre, setProyectoNombre] = useState('mi-fuente');
-
-  // ── Editor state ────────────────────────────
-  const [gridSize,    setGridSize]    = useState(8);
-  const [currentChar, setCurrentChar] = useState('A');
-  const [fontData,    setFontData]    = useState({});
-  const [grid,        setGrid]        = useState([]);
-  const [isSaving,    setIsSaving]    = useState(false);
-  const [tool,        setTool]        = useState('pencil');
-  const [previewText, setPreviewText] = useState('CodeShelf');
+  const [gridSize,       setGridSize]       = useState(8);
+  const [currentChar,    setCurrentChar]    = useState('A');
+  const [fontData,       setFontData]       = useState({});
+  const [grid,           setGrid]           = useState([]);
+  const [isSaving,       setIsSaving]       = useState(false);
+  const [tool,           setTool]           = useState('pencil');
+  const [previewText,    setPreviewText]    = useState('CodeShelf');
 
   const isDrawing = useRef(false);
   const drawMode  = useRef(true);
 
-  // ── Leer proyecto de sessionStorage ─────────
+  // ── Init único: espera Firebase y luego lee sessionStorage ──
   useEffect(() => {
-    const raw = sessionStorage.getItem('proyectoActivo');
-    if (!raw) {
-      // Sin proyecto activo → volver al feed
-      window.location.href = 'feed.html';
-      return;
-    }
-    try {
-      const p = JSON.parse(raw);
-      setProyectoActivo(p.id);
-      setProyectoNombre(p.nombre || 'mi-fuente');
-      setGridSize(p.gridSize || 8);
-      setFontData(p.font || {});
-      setGrid(p.font?.['A'] || Array((p.gridSize || 8) * (p.gridSize || 8)).fill(false));
-      setCurrentChar('A');
-    } catch (e) {
-      console.error('Error leyendo proyecto:', e);
-      window.location.href = 'feed.html';
-    }
-  }, []);
+    const unsub = onAuthStateChanged(auth, (u) => {
+      // Firebase ya resolvió — a partir de aquí podemos decidir
 
-  // ── Auth ─────────────────────────────────────
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, u => {
       if (!u) {
-        // No autenticado → volver al feed (que maneja el login)
-        window.location.href = 'feed.html';
+        // Sin sesión → login está en feed.html
+        window.location.replace('feed.html');
         return;
       }
-      setUser(u);
-      setLoading(false);
-    });
-    return unsub;
-  }, []);
 
-  // ── Guardar fuente ───────────────────────────
+      // Hay sesión → leer proyecto
+      const raw = sessionStorage.getItem('proyectoActivo');
+      if (!raw) {
+        // No se llegó desde el feed con un proyecto seleccionado
+        window.location.replace('feed.html');
+        return;
+      }
+
+      try {
+        const p = JSON.parse(raw);
+        if (!p || !p.id) throw new Error('Proyecto sin id');
+
+        setUser(u);
+        setProyectoActivo(p.id);
+        setProyectoNombre(p.nombre || 'mi-fuente');
+        setGridSize(p.gridSize || 8);
+        setFontData(p.font || {});
+        setGrid(
+          (p.font && p.font['A'])
+            ? p.font['A']
+            : Array((p.gridSize || 8) * (p.gridSize || 8)).fill(false)
+        );
+        setCurrentChar('A');
+        setStatus('ready');
+      } catch (e) {
+        console.error('Error parseando proyecto desde sessionStorage:', e);
+        setErrorMsg('Proyecto inválido. Volviendo al inicio...');
+        setStatus('error');
+        setTimeout(() => window.location.replace('feed.html'), 2000);
+      }
+    });
+
+    return unsub;
+  }, []); // Solo al montar
+
+  // ── Guardar ──────────────────────────────────
   const handleSaveFont = useCallback(async (data) => {
     if (!user || !proyectoActivo) return;
     setIsSaving(true);
@@ -96,7 +104,7 @@ function App() {
         { font: data, gridSize, updatedAt: new Date() },
         { merge: true }
       );
-      // Actualizar sessionStorage con los nuevos datos
+      // Mantener sessionStorage sincronizado para cuando vuelva al feed
       const raw = sessionStorage.getItem('proyectoActivo');
       if (raw) {
         const p = JSON.parse(raw);
@@ -182,20 +190,23 @@ function App() {
     });
   };
 
-  // ── Loading ──────────────────────────────────
-  if (loading || !proyectoActivo) {
+  // ── Render: loading ──────────────────────────
+  if (status === 'loading') {
     return React.createElement('div', {
       style: {
-        height: '100vh', background: '#0a0a0a',
+        height: '100vh', background: '#080b14',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: '18px'
       }
     },
+      React.createElement('style', null,
+        '@keyframes cs-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }'
+      ),
       React.createElement('span', {
         style: {
           fontFamily: FONT_PIXEL, fontSize: '10px',
           color: ACCENT, letterSpacing: '4px',
-          animation: 'pulse 1.4s infinite'
+          animation: 'cs-pulse 1.4s ease-in-out infinite'
         }
       }, 'CARGANDO...'),
       React.createElement('div', {
@@ -204,7 +215,20 @@ function App() {
     );
   }
 
-  // ── Editor ───────────────────────────────────
+  // ── Render: error ────────────────────────────
+  if (status === 'error') {
+    return React.createElement('div', {
+      style: {
+        height: '100vh', background: '#080b14',
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: FONT_MONO, color: ACCENT,
+        fontSize: '12px', letterSpacing: '2px'
+      }
+    }, errorMsg);
+  }
+
+  // ── Render: editor ───────────────────────────
   return React.createElement(EditorPage, {
     isDark, toggleTheme,
     gridSize, currentChar, fontData, grid, isSaving,
@@ -217,7 +241,7 @@ function App() {
     onInvert:      invertCanvas,
     onShift:       doShift,
     onSave:        () => handleSaveFont(fontData),
-    onBack:        () => window.location.href = 'feed.html',
+    onBack:        () => window.location.replace('feed.html'),
     projectName:   proyectoNombre
   });
 }
