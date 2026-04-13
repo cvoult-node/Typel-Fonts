@@ -228,11 +228,20 @@ function App() {
     }, errorMsg);
   }
 
-  // ── Render: editor ───────────────────────────
+// ── Render: editor ───────────────────────────
   return React.createElement(EditorPage, {
-    isDark, toggleTheme,
-    gridSize, currentChar, fontData, grid, isSaving,
-    tool, setTool, previewText, setPreviewText,
+    user,
+    isDark, 
+    toggleTheme,
+    gridSize, 
+    currentChar, 
+    fontData, 
+    grid, 
+    isSaving,
+    tool, 
+    setTool, 
+    previewText, 
+    setPreviewText,
     onPixelDown:   handlePixelDown,
     onPixelEnter:  handlePixelEnter,
     onMouseUp:     handleMouseUp,
