@@ -303,6 +303,7 @@ export function EditorPage({
             })
           )
         ),
+      ),
 
       /* ── Characters panel ── */
       React.createElement('aside', {
@@ -378,5 +379,5 @@ export function EditorPage({
         )
       )
     )
-
-
+  );
+}
