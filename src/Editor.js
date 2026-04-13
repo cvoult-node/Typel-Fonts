@@ -81,17 +81,27 @@ export function EditorPage({
   tool, setTool, previewText, setPreviewText,
   onPixelDown, onPixelEnter, onMouseUp,
   onSwitchChar, onClearCanvas, onInvert, onShift, onSave,
-  onBack, projectName
+  projectName, user // Asegúrate de pasar 'user' desde App.js
 }) {
   const [showExport, setShowExport] = useState(false);
-
   const [openFileMenu, setOpenFileMenu] = useState(false);
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
-  const handleExport = (filename, format) => {
-    buildAndDownload(fontData, gridSize, filename, format);
-    setShowExport(false);
-  };
+  // --- SOLUCIÓN A avatarInit ---
+  // Calculamos la inicial del usuario (del nombre o del correo)
+  const avatarInit = (user?.displayName || user?.email || '?')[0].toUpperCase();
+
+  // Cerrar menús al hacer clic en cualquier parte del editor
+  useEffect(() => {
+    const closeMenus = () => {
+      setOpenFileMenu(false);
+      setOpenUserMenu(false);
+    };
+    if (openFileMenu || openUserMenu) {
+      window.addEventListener('click', closeMenus);
+    }
+    return () => window.removeEventListener('click', closeMenus);
+  }, [openFileMenu, openUserMenu]);
 
   const modeTools = [
     { id: 'pencil',   iconName: 'pencil',   label: 'Libre'    },
@@ -99,6 +109,7 @@ export function EditorPage({
     { id: 'mirror-h', iconName: 'mirror-h', label: 'Espejo H' },
     { id: 'mirror-v', iconName: 'mirror-v', label: 'Espejo V' },
   ];
+
   const actionTools = [
     { icon: '⚡', label: 'Inv',    fn: onInvert },
     { icon: '↑',  label: 'Arriba', fn: () => onShift('up')    },
@@ -108,35 +119,24 @@ export function EditorPage({
   ];
 
   return React.createElement('div', { className: 'editor-layout' },
-    // NAVBAR DEL EDITOR
+    // NAVBAR
     React.createElement('nav', { className: 'navbar' },
       React.createElement('div', { className: 'nav-left' },
-        React.createElement('span', { className: 'logo' }, 'CODESHELF'),
+        React.createElement('span', { className: 'logo', onClick: () => window.location.href='feed.html', style: {cursor:'pointer'} }, 'CODESHELF'),
         
         React.createElement('div', { className: 'dropdown-container' },
           React.createElement('button', { 
             className: 'menu-trigger',
-            // Usamos la función que acabamos de definir
-            onClick: () => setOpenFileMenu(!openFileMenu) 
+            onClick: (e) => { e.stopPropagation(); setOpenFileMenu(!openFileMenu); } 
           }, 'Archivo'),
           
-          // Si openFileMenu es true, se muestra el menú
           openFileMenu && React.createElement('div', { 
             className: 'dd-menu show', 
             style: { left: 0, right: 'auto' } 
           },
-            React.createElement('button', { 
-              className: 'dd-item', 
-              onClick: () => window.location.href = 'feed.html' 
-            }, '📁 Mis Proyectos'),
-            React.createElement('button', { 
-              className: 'dd-item', 
-              onClick: onSave 
-            }, '💾 Guardar (Ctrl+S)'),
-            React.createElement('button', { 
-              className: 'dd-item', 
-              onClick: () => setShowExport(true) 
-            }, '📤 Exportar Fuente')
+            React.createElement('button', { className: 'dd-item', onClick: () => window.location.href = 'feed.html' }, '📁 Mis Proyectos'),
+            React.createElement('button', { className: 'dd-item', onClick: onSave }, '💾 Guardar (Ctrl+S)'),
+            React.createElement('button', { className: 'dd-item', onClick: () => setShowExport(true) }, '📤 Exportar Fuente')
           )
         )
       ),
@@ -145,12 +145,15 @@ export function EditorPage({
         React.createElement('button', { className: 'nav-btn', onClick: toggleTheme }, isDark ? '🌙' : '☀️'),
         React.createElement('div', { 
           className: 'user-avatar', 
-          onClick: () => setOpenUserMenu(!openUserMenu) 
+          onClick: (e) => { e.stopPropagation(); setOpenUserMenu(!openUserMenu); } 
         }, avatarInit),
         
-        // Menú de Usuario (Compartido)
         openUserMenu && React.createElement('div', { className: 'dd-menu show' },
-          React.createElement('button', { className: 'dd-item danger', onClick: () => signOut(auth) }, '🚪 Cerrar Sesión')
+          React.createElement('div', { className: 'dd-header' }, user?.email),
+          React.createElement('button', { 
+            className: 'dd-item danger', 
+            onClick: () => signOut(auth).then(() => window.location.href='index.html') 
+          }, '🚪 Cerrar Sesión')
         )
       )
     ),
