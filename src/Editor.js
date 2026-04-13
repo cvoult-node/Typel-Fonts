@@ -85,6 +85,9 @@ export function EditorPage({
 }) {
   const [showExport, setShowExport] = useState(false);
 
+  const [openFileMenu, setOpenFileMenu] = useState(false);
+  const [openUserMenu, setOpenUserMenu] = useState(false);
+
   const handleExport = (filename, format) => {
     buildAndDownload(fontData, gridSize, filename, format);
     setShowExport(false);
@@ -110,17 +113,30 @@ export function EditorPage({
       React.createElement('div', { className: 'nav-left' },
         React.createElement('span', { className: 'logo' }, 'CODESHELF'),
         
-        // Menú de Archivo
         React.createElement('div', { className: 'dropdown-container' },
           React.createElement('button', { 
             className: 'menu-trigger',
+            // Usamos la función que acabamos de definir
             onClick: () => setOpenFileMenu(!openFileMenu) 
           }, 'Archivo'),
           
-          openFileMenu && React.createElement('div', { className: 'dd-menu show', style: { left: 0 } },
-            React.createElement('button', { className: 'dd-item', onClick: () => window.location.href='feed.html' }, '📁 Mis Proyectos'),
-            React.createElement('button', { className: 'dd-item', onClick: onSave }, '💾 Guardar (Ctrl+S)'),
-            React.createElement('button', { className: 'dd-item', onClick: () => setShowExport(true) }, '📤 Exportar Fuente')
+          // Si openFileMenu es true, se muestra el menú
+          openFileMenu && React.createElement('div', { 
+            className: 'dd-menu show', 
+            style: { left: 0, right: 'auto' } 
+          },
+            React.createElement('button', { 
+              className: 'dd-item', 
+              onClick: () => window.location.href = 'feed.html' 
+            }, '📁 Mis Proyectos'),
+            React.createElement('button', { 
+              className: 'dd-item', 
+              onClick: onSave 
+            }, '💾 Guardar (Ctrl+S)'),
+            React.createElement('button', { 
+              className: 'dd-item', 
+              onClick: () => setShowExport(true) 
+            }, '📤 Exportar Fuente')
           )
         )
       ),
