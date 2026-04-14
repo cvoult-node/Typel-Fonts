@@ -458,7 +458,7 @@
       }
 
       show('screen-app');
-      const { onOpen, onDelete, onCreate } = makeCallbacks(user);
+      const { onOpen, onDelete, onCreate, onRename } = makeCallbacks(user);
       const proyectos = await cargarProyectos(user);
       renderFeed(proyectos, onOpen, onDelete, onRename);
       updateCount(proyectos.length);
