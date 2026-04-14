@@ -7,38 +7,211 @@ import { ACCENT, TECLADO, R_CARD, R_BTN, FONT_MONO, FONT_PIXEL } from './constan
 import { Btn, Icon, Overlay, Modal, Label } from './ui.js';
 import { buildAndDownload } from './canvas.js';
 
-// ── Export modal ─────────────────────────────
-const ExportModal = ({ projectName, onClose, onExport }) => {
-  const [filename, setFilename] = useState(projectName || 'mi-fuente');
-  const [format,   setFormat]   = useState('otf');
+// ── Pixel preview helper ──────────────────────
+const PixelPreview = ({ text, fontData, gridSize, pixelSize = 3, color = ACCENT }) => {
+  const chars = text.split('');
+  const sz = Math.min(gridSize, 32);
+  return React.createElement('div', {
+    style: { display: 'flex', gap: '4px', flexWrap: 'wrap', padding: '8px', minHeight: '28px' }
+  },
+    chars.map((ch, ci) => {
+      const glyph = fontData[ch];
+      return React.createElement('div', {
+        key: ci,
+        style: { display: 'grid', gridTemplateColumns: `repeat(${sz},${pixelSize}px)` }
+      },
+        Array(sz * sz).fill(0).map((_, pi) =>
+          React.createElement('div', {
+            key: pi,
+            style: {
+              width: `${pixelSize}px`, height: `${pixelSize}px`,
+              background: glyph?.[pi] ? color : 'transparent'
+            }
+          })
+        )
+      );
+    })
+  );
+};
+
+// ── Export modal ──────────────────────────────
+const ExportModal = ({ projectName, fontData, gridSize, onClose, onExport }) => {
+  const [filename,      setFilename]      = useState(projectName || 'mi-fuente');
+  const [fontName,      setFontName]      = useState(projectName || 'mi-fuente');
+  const [author,        setAuthor]        = useState('');
+  const [format,        setFormat]        = useState('otf');
+  const [letterSpacing, setLetterSpacing] = useState(0);
+  const [wordSpacing,   setWordSpacing]   = useState(10);
+  const [showAdvanced,  setShowAdvanced]  = useState(false);
+  const [unitsPerEm,    setUnitsPerEm]    = useState(1000);
+  const [ascender,      setAscender]      = useState(800);
+  const [descender,     setDescender]     = useState(-200);
+
+  const LOREM = 'Lorem ipsum\ndolor sit';
+  const PREVIEW_TEXT = 'ABCDE abcde 0123';
+
+  const inputStyle = {
+    background: 'var(--surface2)', border: '1px solid var(--border)',
+    borderRadius: R_BTN, padding: '10px 13px', color: 'var(--text)',
+    fontSize: '13px', outline: 'none', fontFamily: FONT_MONO, width: '100%',
+    transition: 'border-color .15s'
+  };
+
+  const sliderStyle = {
+    width: '100%', accentColor: ACCENT, cursor: 'pointer'
+  };
+
+  const fieldGroup = (label, children) =>
+    React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px' } },
+      React.createElement(Label, null, label),
+      children
+    );
 
   return React.createElement(Overlay, { onClose },
-    React.createElement(Modal, { style: { width: '320px' } },
+    React.createElement('div', {
+      style: {
+        background: 'var(--surface)', border: '1px solid var(--border2)',
+        borderRadius: R_CARD, padding: '28px', width: '100%', maxWidth: '520px',
+        maxHeight: '88vh', overflowY: 'auto',
+        boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
+        display: 'flex', flexDirection: 'column', gap: '20px'
+      }
+    },
+      // Title
       React.createElement('h3', {
         style: { fontFamily: FONT_PIXEL, fontSize: '10px', color: ACCENT, letterSpacing: '2px', margin: 0 }
       }, 'EXPORTAR FUENTE'),
 
-      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px' } },
-        React.createElement(Label, null, 'NOMBRE DEL ARCHIVO'),
-        React.createElement('input', {
-          value: filename,
-          onChange: e => setFilename(e.target.value),
-          style: {
-            background: 'var(--surface2)', border: '1px solid var(--border)',
-            borderRadius: R_BTN, padding: '10px 13px', color: 'var(--text)',
-            fontSize: '13px', outline: 'none', fontFamily: FONT_MONO
-          }
+      // Preview
+      React.createElement('div', {
+        style: {
+          background: 'var(--canvas-bg)', border: '1px solid var(--border)',
+          borderRadius: R_BTN, padding: '16px', minHeight: '72px'
+        }
+      },
+        React.createElement('div', {
+          style: { fontFamily: FONT_MONO, fontSize: '8px', color: 'var(--muted)', letterSpacing: '2px', marginBottom: '10px' }
+        }, 'PREVIEW'),
+        React.createElement(PixelPreview, {
+          text: PREVIEW_TEXT, fontData, gridSize, pixelSize: 4, color: ACCENT
         })
       ),
 
-      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px' } },
-        React.createElement(Label, null, 'FORMATO'),
+      // Nombre archivo
+      fieldGroup('NOMBRE DEL ARCHIVO',
+        React.createElement('input', {
+          value: filename, onChange: e => setFilename(e.target.value),
+          style: inputStyle,
+          onFocus: e => e.target.style.borderColor = ACCENT,
+          onBlur:  e => e.target.style.borderColor = 'var(--border)'
+        })
+      ),
+
+      // Nombre fuente
+      fieldGroup('NOMBRE DE LA FUENTE (familia)',
+        React.createElement('input', {
+          value: fontName, onChange: e => setFontName(e.target.value),
+          style: inputStyle,
+          onFocus: e => e.target.style.borderColor = ACCENT,
+          onBlur:  e => e.target.style.borderColor = 'var(--border)'
+        })
+      ),
+
+      // Autor
+      fieldGroup('AUTOR',
+        React.createElement('input', {
+          value: author, placeholder: 'Tu nombre o seudónimo',
+          onChange: e => setAuthor(e.target.value),
+          style: { ...inputStyle },
+          onFocus: e => e.target.style.borderColor = ACCENT,
+          onBlur:  e => e.target.style.borderColor = 'var(--border)'
+        })
+      ),
+
+      // Interletraje
+      fieldGroup('INTERLETRAJE (letter spacing)',
+        React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px' } },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, 'Ajuste de separación entre letras'),
+            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '12px', color: ACCENT, minWidth: '32px', textAlign: 'right' } }, letterSpacing)
+          ),
+          React.createElement('input', {
+            type: 'range', min: 0, max: 30, value: letterSpacing,
+            onChange: e => setLetterSpacing(Number(e.target.value)),
+            style: sliderStyle
+          })
+        )
+      ),
+
+      // Espaciado de palabras
+      fieldGroup('ESPACIADO DE PALABRAS (word spacing)',
+        React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px' } },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, 'Ancho del espacio entre palabras'),
+            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '12px', color: ACCENT, minWidth: '32px', textAlign: 'right' } }, wordSpacing)
+          ),
+          React.createElement('input', {
+            type: 'range', min: 0, max: 50, value: wordSpacing,
+            onChange: e => setWordSpacing(Number(e.target.value)),
+            style: sliderStyle
+          })
+        )
+      ),
+
+      // Opciones avanzadas
+      React.createElement('div', null,
+        React.createElement('button', {
+          onClick: () => setShowAdvanced(v => !v),
+          style: {
+            display: 'flex', alignItems: 'center', gap: '8px', background: 'none',
+            border: 'none', cursor: 'pointer', fontFamily: FONT_MONO,
+            fontSize: '9px', letterSpacing: '2px', color: 'var(--muted)', padding: '4px 0'
+          }
+        },
+          React.createElement('span', { style: { transition: 'transform .2s', transform: showAdvanced ? 'rotate(90deg)' : 'none' } }, '▶'),
+          'OPCIONES AVANZADAS'
+        ),
+        showAdvanced && React.createElement('div', {
+          style: {
+            marginTop: '14px', padding: '16px',
+            background: 'var(--surface2)', borderRadius: R_BTN,
+            border: '1px solid var(--border)',
+            display: 'flex', flexDirection: 'column', gap: '14px'
+          }
+        },
+          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' } },
+            ...[
+              ['UNITS PER EM', unitsPerEm, setUnitsPerEm, 500, 4000],
+              ['ASCENDENTE',   ascender,   setAscender,  -200, 2000],
+              ['DESCENDENTE',  descender,  setDescender, -800, 200]
+            ].map(([lbl, val, setter, min, max]) =>
+              React.createElement('div', { key: lbl, style: { display: 'flex', flexDirection: 'column', gap: '5px' } },
+                React.createElement('label', { style: { fontFamily: FONT_MONO, fontSize: '8px', color: 'var(--muted)', letterSpacing: '1px' } }, lbl),
+                React.createElement('input', {
+                  type: 'number', value: val, min, max,
+                  onChange: e => setter(Number(e.target.value)),
+                  style: { ...inputStyle, fontSize: '12px', padding: '8px 10px' },
+                  onFocus: e => e.target.style.borderColor = ACCENT,
+                  onBlur:  e => e.target.style.borderColor = 'var(--border)'
+                })
+              )
+            )
+          ),
+          React.createElement('p', {
+            style: { fontFamily: FONT_MONO, fontSize: '9px', color: 'var(--muted2)', lineHeight: '1.6' }
+          }, 'Estos valores definen la métrica vertical interna de la fuente. Ajústalos solo si sabes lo que haces.')
+        )
+      ),
+
+      // Formato
+      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px' } },
+        React.createElement(Label, null, 'FORMATO DE EXPORTACIÓN'),
         React.createElement('div', { style: { display: 'flex', gap: '8px' } },
           ['otf', 'ttf', 'woff'].map(f =>
             React.createElement('button', {
               key: f, onClick: () => setFormat(f),
               style: {
-                flex: 1, padding: '9px', borderRadius: R_BTN, cursor: 'pointer',
+                flex: 1, padding: '10px', borderRadius: R_BTN, cursor: 'pointer',
                 fontFamily: FONT_MONO, fontWeight: '700', fontSize: '11px',
                 letterSpacing: '1px', textTransform: 'uppercase', transition: 'all .13s',
                 background: format === f ? ACCENT : 'var(--surface2)',
@@ -50,57 +223,196 @@ const ExportModal = ({ projectName, onClose, onExport }) => {
         )
       ),
 
-      React.createElement('div', { style: { display: 'flex', gap: '10px' } },
-        React.createElement(Btn, {
+      // Botones
+      React.createElement('div', { style: { display: 'flex', gap: '10px', paddingTop: '4px' } },
+        React.createElement('button', {
           onClick: onClose,
           style: {
-            flex: 1, padding: '11px',
-            background: 'var(--surface2)', border: '1px solid var(--border)',
-            borderRadius: R_BTN, color: 'var(--muted)', fontSize: '11px'
+            flex: 1, padding: '12px', background: 'var(--surface2)',
+            border: '1px solid var(--border)', borderRadius: R_BTN,
+            color: 'var(--muted)', fontSize: '11px', fontFamily: FONT_MONO, cursor: 'pointer'
           }
         }, 'CANCELAR'),
-        React.createElement(Btn, {
-          onClick: () => onExport(filename, format),
+        React.createElement('button', {
+          onClick: () => onExport(filename, format, {
+            fontName, author, letterSpacing, wordSpacing,
+            unitsPerEm, ascender, descender
+          }),
           style: {
-            flex: 1, padding: '11px',
-            background: ACCENT, borderRadius: R_BTN,
-            color: '#fff', fontWeight: '700', fontSize: '11px'
+            flex: 2, padding: '12px', background: ACCENT, borderRadius: R_BTN,
+            color: '#fff', fontWeight: '700', fontSize: '11px',
+            fontFamily: FONT_MONO, border: 'none', cursor: 'pointer',
+            transition: 'background .15s'
           }
-        }, 'EXPORTAR')
+        }, '⬇ EXPORTAR FUENTE')
       )
     )
   );
 };
 
-// ── Small SVG icon helper (inline img) ───────
-const SvgIcon = ({ name, size = 14, style = {} }) =>
+// ── Publish modal ─────────────────────────────
+const PublishModal = ({ projectName, fontData, gridSize, onClose, onPublish, isPublishing, published }) => {
+  const [previewText, setPreviewText] = useState('HELLO WORLD');
+
+  if (published) {
+    return React.createElement(Overlay, { onClose },
+      React.createElement('div', {
+        style: {
+          background: 'var(--surface)', border: '1px solid var(--border2)',
+          borderRadius: R_CARD, padding: '36px 32px', width: '100%', maxWidth: '400px',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.25)', textAlign: 'center',
+          display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center'
+        }
+      },
+        React.createElement('div', { style: { fontSize: '32px' } }, '🎉'),
+        React.createElement('h3', { style: { fontFamily: FONT_PIXEL, fontSize: '10px', color: ACCENT, letterSpacing: '2px' } }, '¡PUBLICADO!'),
+        React.createElement('p', { style: { fontFamily: FONT_MONO, fontSize: '11px', color: 'var(--muted)', lineHeight: '1.7' } },
+          `"${projectName}" ya está visible en la galería pública de CodeShelf.`
+        ),
+        React.createElement('button', {
+          onClick: onClose,
+          style: {
+            padding: '12px 28px', background: ACCENT, border: 'none', borderRadius: R_BTN,
+            color: '#fff', fontFamily: FONT_MONO, fontWeight: '700', fontSize: '11px',
+            letterSpacing: '2px', cursor: 'pointer'
+          }
+        }, 'CERRAR')
+      )
+    );
+  }
+
+  return React.createElement(Overlay, { onClose },
+    React.createElement('div', {
+      style: {
+        background: 'var(--surface)', border: '1px solid var(--border2)',
+        borderRadius: R_CARD, padding: '28px', width: '100%', maxWidth: '440px',
+        boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
+        display: 'flex', flexDirection: 'column', gap: '18px'
+      }
+    },
+      React.createElement('h3', {
+        style: { fontFamily: FONT_PIXEL, fontSize: '10px', color: ACCENT, letterSpacing: '2px' }
+      }, 'PUBLICAR FUENTE'),
+      React.createElement('p', {
+        style: { fontFamily: FONT_MONO, fontSize: '11px', color: 'var(--muted)', lineHeight: '1.7' }
+      }, `Esto publicará "${projectName}" en la galería pública para que otros usuarios puedan verla y descargarla.`),
+
+      // Preview
+      React.createElement('div', {
+        style: {
+          background: 'var(--canvas-bg)', border: '1px solid var(--border)',
+          borderRadius: R_BTN, padding: '14px'
+        }
+      },
+        React.createElement('div', {
+          style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }
+        },
+          React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '8px', color: 'var(--muted)', letterSpacing: '2px' } }, 'TEXTO DE PREVIEW'),
+          React.createElement('input', {
+            value: previewText,
+            onChange: e => setPreviewText(e.target.value),
+            style: {
+              background: 'none', border: 'none', outline: 'none',
+              color: 'var(--text)', fontSize: '11px', fontFamily: FONT_MONO,
+              textAlign: 'right', maxWidth: '160px'
+            }
+          })
+        ),
+        React.createElement(PixelPreview, { text: previewText, fontData, gridSize, pixelSize: 4, color: ACCENT })
+      ),
+
+      React.createElement('div', { style: { display: 'flex', gap: '10px' } },
+        React.createElement('button', {
+          onClick: onClose,
+          style: {
+            flex: 1, padding: '12px', background: 'var(--surface2)',
+            border: '1px solid var(--border)', borderRadius: R_BTN,
+            color: 'var(--muted)', fontSize: '11px', fontFamily: FONT_MONO, cursor: 'pointer'
+          }
+        }, 'CANCELAR'),
+        React.createElement('button', {
+          onClick: () => onPublish(previewText),
+          disabled: isPublishing,
+          style: {
+            flex: 2, padding: '12px', background: ACCENT, borderRadius: R_BTN,
+            color: '#fff', fontWeight: '700', fontSize: '11px',
+            fontFamily: FONT_MONO, border: 'none', cursor: 'pointer',
+            opacity: isPublishing ? .6 : 1, transition: 'background .15s'
+          }
+        }, isPublishing ? 'PUBLICANDO...' : '🌐 PUBLICAR EN GALERÍA')
+      )
+    )
+  );
+};
+
+// ── Guide overlay SVG ─────────────────────────
+const GuideOverlay = ({ gridSize }) => {
+  const step = gridSize <= 8 ? 4 : gridSize <= 16 ? 4 : 8;
+  const lines = [];
+  for (let i = step; i < gridSize; i += step) {
+    const pct = (i / gridSize * 100).toFixed(4);
+    lines.push(
+      React.createElement('line', {
+        key: `v${i}`, x1: `${pct}%`, y1: '0', x2: `${pct}%`, y2: '100%',
+        stroke: 'rgba(191,69,69,0.35)', strokeWidth: '1'
+      }),
+      React.createElement('line', {
+        key: `h${i}`, x1: '0', y1: `${pct}%`, x2: '100%', y2: `${pct}%`,
+        stroke: 'rgba(191,69,69,0.35)', strokeWidth: '1'
+      })
+    );
+  }
+  // Línea central (mitad)
+  const mid = ((gridSize / 2) / gridSize * 100).toFixed(4);
+  lines.push(
+    React.createElement('line', {
+      key: 'vc', x1: `${mid}%`, y1: '0', x2: `${mid}%`, y2: '100%',
+      stroke: 'rgba(191,69,69,0.55)', strokeWidth: '1.5'
+    }),
+    React.createElement('line', {
+      key: 'hc', x1: '0', y1: `${mid}%`, x2: '100%', y2: `${mid}%`,
+      stroke: 'rgba(191,69,69,0.55)', strokeWidth: '1.5'
+    })
+  );
+  return React.createElement('svg', {
+    style: {
+      position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+      pointerEvents: 'none', zIndex: 5
+    },
+    xmlns: 'http://www.w3.org/2000/svg'
+  }, ...lines);
+};
+
+// ── Toolbar icon (auto-sized) ─────────────────
+const ToolIcon = ({ name, size = 16, active = false, style = {} }) =>
   React.createElement('img', {
     src: `./src/icons/${name}.svg`,
-    width: size, height: size,
     style: {
-      display: 'inline-block', verticalAlign: 'middle',
-      flexShrink: 0, filter: 'var(--icon-filter)',
-      opacity: .7, ...style
+      width: `${size}px`, height: `${size}px`, display: 'block',
+      filter: active ? 'invert(1)' : 'var(--icon-filter)',
+      opacity: active ? 1 : .65, flexShrink: 0, ...style
     }
   });
 
-// ── Editor page ──────────────────────────────
+// ── Editor page ───────────────────────────────
 export function EditorPage({
   user, isDark, toggleTheme,
   gridSize, currentChar, fontData, grid, isSaving,
   tool, setTool, previewText, setPreviewText,
   onPixelDown, onPixelEnter, onMouseUp,
   onSwitchChar, onClearCanvas, onInvert, onShift, onSave,
-  onBack, projectName
+  onBack, onPublish, projectName,
+  isPublishing, publishedOk, onResetPublish
 }) {
   const [showExport,    setShowExport]    = useState(false);
+  const [showPublish,   setShowPublish]   = useState(false);
   const [openFileMenu,  setOpenFileMenu]  = useState(false);
   const [openUserMenu,  setOpenUserMenu]  = useState(false);
   const [avatarColor,   setAvatarColor]   = useState(ACCENT);
+  const [showGuides,    setShowGuides]    = useState(false);
 
   const avatarInit = (user?.displayName || user?.email || '?')[0].toUpperCase();
 
-  // Load avatar color from profile
   useEffect(() => {
     if (!user) return;
     import('./firebase.js').then(({ db }) => {
@@ -146,13 +458,10 @@ export function EditorPage({
       style: {
         height: '52px', padding: '0 20px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        borderBottom: '1px solid var(--border)',
-        background: 'var(--nav-bg)',
-        backdropFilter: 'blur(16px)',
-        position: 'sticky', top: 0, zIndex: 200
+        borderBottom: '1px solid var(--border)', background: 'var(--nav-bg)',
+        backdropFilter: 'blur(16px)', position: 'sticky', top: 0, zIndex: 200
       }
     },
-      // Left: logo + file menu
       React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '4px' } },
         React.createElement('span', {
           onClick: onBack,
@@ -179,37 +488,35 @@ export function EditorPage({
             style: {
               position: 'absolute', top: 'calc(100% + 8px)', left: 0,
               background: 'var(--surface)', border: '1px solid var(--border2)',
-              borderRadius: '10px', minWidth: '200px', zIndex: 300,
+              borderRadius: '10px', minWidth: '210px', zIndex: 300,
               boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
               overflow: 'hidden', padding: '5px 0'
             }
           },
             [
-              { icon: 'fonts',  label: 'Mis proyectos', fn: onBack },
-              { icon: 'save',   label: `Guardar${isSaving ? '...' : '  (Ctrl+S)'}`, fn: onSave },
-              { icon: 'export', label: 'Exportar fuente', fn: () => { setShowExport(true); setOpenFileMenu(false); } },
+              { icon: 'fonts',   label: 'Mis proyectos',    fn: onBack },
+              { icon: 'save',    label: `Guardar  (Ctrl+S)`, fn: onSave },
+              { icon: 'export',  label: 'Exportar fuente',   fn: () => { setShowExport(true); setOpenFileMenu(false); } },
+              { icon: 'publish', label: 'Publicar en galería', fn: () => { setShowPublish(true); setOpenFileMenu(false); } },
             ].map(({ icon, label, fn }) =>
               React.createElement('button', {
-                key: label,
-                onClick: () => { fn(); setOpenFileMenu(false); },
+                key: label, onClick: () => { fn(); setOpenFileMenu(false); },
                 style: {
                   display: 'flex', alignItems: 'center', gap: '10px',
-                  width: '100%', padding: '9px 16px',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: FONT_MONO, fontSize: '11px', color: 'var(--muted)',
-                  textAlign: 'left', transition: 'background .12s, color .12s'
+                  width: '100%', padding: '9px 16px', background: 'none', border: 'none',
+                  cursor: 'pointer', fontFamily: FONT_MONO, fontSize: '11px',
+                  color: 'var(--muted)', textAlign: 'left', transition: 'background .12s, color .12s'
                 },
                 onMouseEnter: e => { e.currentTarget.style.background = 'rgba(130,100,200,0.07)'; e.currentTarget.style.color = 'var(--text)'; },
                 onMouseLeave: e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--muted)'; }
               },
-                React.createElement('img', { src: `./src/icons/${icon}.svg`, width: 14, height: 14, style: { filter: 'var(--icon-filter)', opacity: .5 } }),
+                React.createElement(ToolIcon, { name: icon, size: 14, style: { opacity: .5, filter: 'var(--icon-filter)' } }),
                 label
               )
             )
           )
         ),
 
-        // Project name
         React.createElement('span', {
           style: {
             fontFamily: FONT_MONO, fontSize: '9px', letterSpacing: '2px',
@@ -218,16 +525,30 @@ export function EditorPage({
         }, projectName || '')
       ),
 
-      // Right: save indicator + theme + avatar
       React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
         isSaving && React.createElement('span', {
           style: { fontFamily: FONT_MONO, fontSize: '9px', color: 'var(--muted2)', letterSpacing: '2px' }
         }, 'GUARDANDO...'),
 
-        // Theme toggle
+        // Guides toggle button
         React.createElement('button', {
-          onClick: toggleTheme,
-          title: isDark ? 'Tema claro' : 'Tema oscuro',
+          onClick: () => setShowGuides(v => !v),
+          title: showGuides ? 'Ocultar guías' : 'Mostrar guías',
+          style: {
+            height: '32px', padding: '0 10px', borderRadius: R_BTN,
+            background: showGuides ? ACCENT : 'var(--surface2)',
+            border: showGuides ? 'none' : '1px solid var(--border)',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+            fontFamily: FONT_MONO, fontSize: '8px', letterSpacing: '1px',
+            color: showGuides ? '#fff' : 'var(--muted)', transition: 'all .15s'
+          }
+        },
+          React.createElement(ToolIcon, { name: 'guides', size: 14, active: showGuides }),
+          'GUÍAS'
+        ),
+
+        React.createElement('button', {
+          onClick: toggleTheme, title: isDark ? 'Tema claro' : 'Tema oscuro',
           style: {
             width: '32px', height: '32px', borderRadius: '50%',
             background: 'var(--surface2)', border: '1px solid var(--border)',
@@ -235,13 +556,9 @@ export function EditorPage({
             transition: 'background .15s'
           }
         },
-          React.createElement('img', {
-            src: './src/icons/theme.svg', width: 14, height: 14,
-            style: { filter: 'var(--icon-filter)', opacity: .6 }
-          })
+          React.createElement(ToolIcon, { name: 'theme', size: 14 })
         ),
 
-        // Avatar / user menu
         React.createElement('div', { style: { position: 'relative' } },
           React.createElement('div', {
             onClick: e => { e.stopPropagation(); setOpenUserMenu(v => !v); },
@@ -260,15 +577,11 @@ export function EditorPage({
               position: 'absolute', top: 'calc(100% + 10px)', right: 0,
               background: 'var(--surface)', border: '1px solid var(--border2)',
               borderRadius: '12px', minWidth: '210px', zIndex: 300,
-              boxShadow: '0 20px 56px rgba(0,0,0,0.18)', overflow: 'hidden',
-              padding: '5px 0'
+              boxShadow: '0 20px 56px rgba(0,0,0,0.18)', overflow: 'hidden', padding: '5px 0'
             }
           },
             React.createElement('div', {
-              style: {
-                padding: '12px 16px', borderBottom: '1px solid var(--border)',
-                fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)'
-              }
+              style: { padding: '12px 16px', borderBottom: '1px solid var(--border)', fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' }
             }, user?.email || ''),
             [
               { icon: 'explore', label: 'Explorar fuentes',  fn: () => window.location.href = 'social.html' },
@@ -276,19 +589,17 @@ export function EditorPage({
               { icon: 'user',    label: 'Mi perfil',         fn: () => window.location.href = 'profile.html' },
             ].map(({ icon, label, fn }) =>
               React.createElement('button', {
-                key: label,
-                onClick: () => { fn(); setOpenUserMenu(false); },
+                key: label, onClick: () => { fn(); setOpenUserMenu(false); },
                 style: {
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  width: '100%', padding: '9px 16px',
+                  display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '9px 16px',
                   background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: FONT_MONO, fontSize: '11px', color: 'var(--muted)',
-                  textAlign: 'left', transition: 'background .12s, color .12s'
+                  fontFamily: FONT_MONO, fontSize: '11px', color: 'var(--muted)', textAlign: 'left',
+                  transition: 'background .12s, color .12s'
                 },
                 onMouseEnter: e => { e.currentTarget.style.background = 'rgba(130,100,200,0.07)'; e.currentTarget.style.color = 'var(--text)'; },
                 onMouseLeave: e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--muted)'; }
               },
-                React.createElement('img', { src: `./src/icons/${icon}.svg`, width: 14, height: 14, style: { filter: 'var(--icon-filter)', opacity: .5 } }),
+                React.createElement(ToolIcon, { name: icon, size: 14, style: { opacity: .5, filter: 'var(--icon-filter)' } }),
                 label
               )
             ),
@@ -296,14 +607,12 @@ export function EditorPage({
               React.createElement('button', {
                 onClick: () => signOut(auth).then(() => window.location.href = 'index.html'),
                 style: {
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  width: '100%', padding: '9px 16px',
+                  display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '9px 16px',
                   background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: FONT_MONO, fontSize: '11px', color: ACCENT,
-                  textAlign: 'left'
+                  fontFamily: FONT_MONO, fontSize: '11px', color: ACCENT, textAlign: 'left'
                 }
               },
-                React.createElement('img', { src: './src/icons/logout.svg', width: 14, height: 14, style: { opacity: .65 } }),
+                React.createElement(ToolIcon, { name: 'logout', size: 14, style: { opacity: .65 } }),
                 'Cerrar sesión'
               )
             )
@@ -334,10 +643,7 @@ export function EditorPage({
           style: { display: 'flex', alignItems: 'center', gap: '16px', width: '100%' }
         },
           React.createElement('div', {
-            style: {
-              fontFamily: FONT_PIXEL, fontSize: '40px', lineHeight: 1,
-              color: ACCENT, minWidth: '52px', textAlign: 'center'
-            }
+            style: { fontFamily: FONT_PIXEL, fontSize: '40px', lineHeight: 1, color: ACCENT, minWidth: '52px', textAlign: 'center' }
           }, currentChar === ' ' ? '·' : currentChar),
           React.createElement('div', { style: { flex: 1 } },
             React.createElement('div', {
@@ -345,7 +651,7 @@ export function EditorPage({
             }, 'EDITANDO CARÁCTER'),
             React.createElement('div', {
               style: { fontFamily: FONT_MONO, fontSize: '11px', color: 'var(--text)', letterSpacing: '1px' }
-            }, `U+${(currentChar.codePointAt(0) || 0).toString(16).toUpperCase().padStart(4,'0')}`)
+            }, `U+${(currentChar.codePointAt(0) || 0).toString(16).toUpperCase().padStart(4,'0')} · Grid ${gridSize}×${gridSize}`)
           )
         ),
 
@@ -357,31 +663,20 @@ export function EditorPage({
             border: '1px solid var(--border)', width: '100%'
           }
         },
-          // Draw tools
           ...modeTools.map(t =>
             React.createElement('button', {
-              key: t.id,
-              onClick: () => setTool(t.id),
-              title: t.label,
+              key: t.id, onClick: () => setTool(t.id), title: t.label,
               style: {
                 ...toolbarBase,
                 background: tool === t.id ? ACCENT : 'transparent',
-                border: tool === t.id ? 'none' : 'none',
                 color: tool === t.id ? '#fff' : 'var(--muted)',
               }
             },
-              React.createElement('img', {
-                src: `./src/icons/${t.iconName}.svg`, width: 'auto', height: 'auto',
-                style: { filter: tool === t.id ? 'invert(1)' : 'var(--icon-filter)', opacity: tool === t.id ? 1 : .65 }
-              }),
+              React.createElement(ToolIcon, { name: t.iconName, size: 16, active: tool === t.id }),
               React.createElement('span', { style: { fontSize: '8px', letterSpacing: '1px' } }, t.label)
             )
           ),
-
-          // Divider
           React.createElement('div', { style: { width: '1px', height: '44px', background: 'var(--border)', margin: '0 2px' } }),
-
-          // Action tools
           ...actionTools.map((t, i) =>
             React.createElement('button', {
               key: i, onClick: t.fn, title: t.label,
@@ -392,42 +687,43 @@ export function EditorPage({
               onMouseEnter: e => { e.currentTarget.style.background = 'var(--surface3)'; e.currentTarget.style.borderColor = 'var(--border2)'; },
               onMouseLeave: e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; }
             },
-              React.createElement('img', {
-                src: `./src/icons/${t.iconName}.svg`, width: 'auto', height: 'auto',
-                style: { filter: 'var(--icon-filter)', opacity: .65 }
-              }),
+              React.createElement(ToolIcon, { name: t.iconName, size: 16 }),
               React.createElement('span', { style: { fontSize: '8px', letterSpacing: '1px' } }, t.label)
             )
           ),
         ),
 
-        /* Pixel canvas */
+        /* Pixel canvas with guides overlay */
         React.createElement('div', {
-          style: {
-            display: 'grid',
-            gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-            width: 'min(78vw, 460px)', height: 'min(78vw, 460px)',
-            gap: '1px', background: 'var(--grid-line)',
-            borderRadius: R_CARD, overflow: 'hidden',
-            border: `2px solid var(--border-accent)`,
-            cursor: 'crosshair', userSelect: 'none',
-            boxShadow: 'var(--shadow-card)'
-          },
-          onMouseUp: onMouseUp,
-          onMouseLeave: onMouseUp
+          style: { position: 'relative', width: 'min(78vw, 460px)', height: 'min(78vw, 460px)' }
         },
-          grid.map((active, i) =>
-            React.createElement('div', {
-              key: i,
-              onMouseDown: e => { e.preventDefault(); onPixelDown(i, active, e.button === 2); },
-              onMouseEnter: () => onPixelEnter(i),
-              onContextMenu: e => e.preventDefault(),
-              style: {
-                width: '100%', height: '100%', transition: 'background .03s',
-                background: active ? ACCENT : 'var(--empty)',
-              }
-            })
-          )
+          React.createElement('div', {
+            style: {
+              display: 'grid',
+              gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+              width: '100%', height: '100%',
+              gap: '1px', background: 'var(--grid-line)',
+              borderRadius: R_CARD, overflow: 'hidden',
+              border: `2px solid var(--border-accent)`,
+              cursor: 'crosshair', userSelect: 'none',
+              boxShadow: 'var(--shadow-card)'
+            },
+            onMouseUp: onMouseUp, onMouseLeave: onMouseUp
+          },
+            grid.map((active, i) =>
+              React.createElement('div', {
+                key: i,
+                onMouseDown: e => { e.preventDefault(); onPixelDown(i, active, e.button === 2); },
+                onMouseEnter: () => onPixelEnter(i),
+                onContextMenu: e => e.preventDefault(),
+                style: {
+                  width: '100%', height: '100%', transition: 'background .03s',
+                  background: active ? ACCENT : 'var(--empty)',
+                }
+              })
+            )
+          ),
+          showGuides && React.createElement(GuideOverlay, { gridSize })
         ),
 
         /* Preview */
@@ -443,8 +739,7 @@ export function EditorPage({
           },
             React.createElement(Label, { style: { fontSize: '8px', letterSpacing: '3px', color: 'var(--muted)' } }, 'PREVIEW'),
             React.createElement('input', {
-              value: previewText,
-              onChange: e => setPreviewText(e.target.value),
+              value: previewText, onChange: e => setPreviewText(e.target.value),
               placeholder: 'Texto de preview...',
               style: {
                 background: 'none', border: 'none', outline: 'none',
@@ -500,7 +795,6 @@ export function EditorPage({
           }, 'LIMPIAR')
         ),
 
-        /* Stats */
         React.createElement('div', {
           style: {
             display: 'flex', gap: '8px', marginBottom: '14px',
@@ -514,17 +808,12 @@ export function EditorPage({
             { val: grid.filter(Boolean).length,                                  lbl: 'PÍXELES' }
           ].map(({ val, lbl }) =>
             React.createElement('div', { key: lbl, style: { flex: 1, textAlign: 'center' } },
-              React.createElement('div', {
-                style: { fontSize: '17px', fontWeight: '700', color: ACCENT, fontFamily: FONT_MONO }
-              }, val),
-              React.createElement('div', {
-                style: { fontSize: '7px', color: 'var(--muted)', letterSpacing: '2px', fontFamily: FONT_MONO, marginTop: '2px' }
-              }, lbl)
+              React.createElement('div', { style: { fontSize: '17px', fontWeight: '700', color: ACCENT, fontFamily: FONT_MONO } }, val),
+              React.createElement('div', { style: { fontSize: '7px', color: 'var(--muted)', letterSpacing: '2px', fontFamily: FONT_MONO, marginTop: '2px' } }, lbl)
             )
           )
         ),
 
-        /* Char grid */
         React.createElement('div', {
           style: {
             display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: '4px',
@@ -541,11 +830,9 @@ export function EditorPage({
                 border: isActive ? 'none' : `1px solid ${configured ? 'rgba(191,69,69,0.22)' : 'var(--border)'}`,
                 background: isActive ? ACCENT : configured ? 'rgba(191,69,69,0.07)' : 'var(--surface2)',
                 color: isActive ? '#fff' : configured ? ACCENT : 'var(--muted)',
-                fontWeight: '700', fontSize: '13px',
-                fontFamily: FONT_MONO, cursor: 'pointer',
+                fontWeight: '700', fontSize: '13px', fontFamily: FONT_MONO, cursor: 'pointer',
                 position: 'relative',
-                boxShadow: isActive ? `0 3px 10px ${ACCENT}40` : 'none',
-                transition: 'all .1s'
+                boxShadow: isActive ? `0 3px 10px ${ACCENT}40` : 'none', transition: 'all .1s'
               }
             },
               t === ' ' ? '·' : t,
@@ -561,13 +848,21 @@ export function EditorPage({
       )
     ),
 
+    // Modals
     showExport && React.createElement(ExportModal, {
-      projectName,
+      projectName, fontData, gridSize,
       onClose: () => setShowExport(false),
-      onExport: (filename, format) => {
-        buildAndDownload(fontData, gridSize, filename, format);
+      onExport: (filename, format, meta) => {
+        buildAndDownload(fontData, gridSize, filename, format, meta);
         setShowExport(false);
       }
+    }),
+
+    showPublish && React.createElement(PublishModal, {
+      projectName, fontData, gridSize,
+      isPublishing, published: publishedOk,
+      onClose: () => { setShowPublish(false); onResetPublish && onResetPublish(); },
+      onPublish: (prevText) => onPublish && onPublish(prevText)
     })
   );
 }

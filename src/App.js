@@ -5,42 +5,39 @@ import React, { useState, useEffect, useRef, useCallback } from 'https://esm.sh/
 import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
 import opentype from 'https://esm.sh/opentype.js';
 
-import {
-  auth, db, onAuthStateChanged,
-  doc, setDoc
-} from './firebase.js';
-
+import { auth, db, onAuthStateChanged, doc, setDoc } from './firebase.js';
 import { ACCENT, FONT_MONO, FONT_PIXEL } from './constants.js';
-import { floodFill, shiftGrid }          from './canvas.js';
-import { EditorPage }                    from './Editor.js';
+import { floodFill, shiftGrid } from './canvas.js';
+import { EditorPage } from './Editor.js';
+import { publishFont } from './publish.js';
 
 window.__opentype__ = opentype;
 
 function App() {
   // ── Theme ──────────────────────────────────
   const [theme, setTheme] = useState(() => localStorage.getItem('cs-theme') || 'light');
-  const isDark      = theme === 'dark';
+  const isDark = theme === 'dark';
   const toggleTheme = () => {
     const t = theme === 'dark' ? 'light' : 'dark';
-    setTheme(t);
-    localStorage.setItem('cs-theme', t);
+    setTheme(t); localStorage.setItem('cs-theme', t);
   };
   useEffect(() => { document.documentElement.className = theme; }, [theme]);
 
   // ── Estado ──────────────────────────────────
-  const [status,   setStatus]   = useState('loading');
-  const [user,     setUser]     = useState(null);
-  const [errorMsg, setErrorMsg] = useState('');
-
-  const [proyectoActivo, setProyectoActivo] = useState(null);
-  const [proyectoNombre, setProyectoNombre] = useState('mi-fuente');
-  const [gridSize,       setGridSize]       = useState(8);
-  const [currentChar,    setCurrentChar]    = useState('A');
-  const [fontData,       setFontData]       = useState({});
-  const [grid,           setGrid]           = useState([]);
-  const [isSaving,       setIsSaving]       = useState(false);
-  const [tool,           setTool]           = useState('pencil');
-  const [previewText,    setPreviewText]    = useState('CodeShelf');
+  const [status,        setStatus]        = useState('loading');
+  const [user,          setUser]          = useState(null);
+  const [errorMsg,      setErrorMsg]      = useState('');
+  const [proyectoActivo,setProyectoActivo] = useState(null);
+  const [proyectoNombre,setProyectoNombre] = useState('mi-fuente');
+  const [gridSize,      setGridSize]      = useState(8);
+  const [currentChar,   setCurrentChar]   = useState('A');
+  const [fontData,      setFontData]      = useState({});
+  const [grid,          setGrid]          = useState([]);
+  const [isSaving,      setIsSaving]      = useState(false);
+  const [tool,          setTool]          = useState('pencil');
+  const [previewText,   setPreviewText]   = useState('CodeShelf');
+  const [isPublishing,  setIsPublishing]  = useState(false);
+  const [publishedOk,   setPublishedOk]   = useState(false);
 
   const isDrawing = useRef(false);
   const drawMode  = useRef(true);
@@ -89,6 +86,25 @@ function App() {
     } catch (err) { console.error(err); alert('Error al guardar'); }
     setIsSaving(false);
   }, [user, proyectoActivo, gridSize]);
+
+  // ── Publish ─────────────────────────────────
+  const handlePublish = useCallback(async (prevText) => {
+    if (!user || !proyectoActivo) return;
+    setIsPublishing(true);
+    try {
+      await publishFont(user, {
+        id:       proyectoActivo,
+        nombre:   proyectoNombre,
+        gridSize,
+        font:     fontData
+      }, prevText || 'HELLO');
+      setPublishedOk(true);
+    } catch (err) {
+      console.error(err);
+      alert('Error al publicar: ' + err.message);
+    }
+    setIsPublishing(false);
+  }, [user, proyectoActivo, proyectoNombre, gridSize, fontData]);
 
   // ── Canvas tools ────────────────────────────
   const applyPixelTool = useCallback((prevGrid, i) => {
@@ -150,38 +166,30 @@ function App() {
     });
   };
 
-  // ── Keyboard shortcut ───────────────────────
   useEffect(() => {
     const handler = (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); handleSaveFont(fontData); } };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [fontData, handleSaveFont]);
 
-  // ── Render states ───────────────────────────
+  // ── Loading / error states ───────────────────
   if (status === 'loading') {
     return React.createElement('div', {
-      style: {
-        height: '100vh', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', gap: '18px'
-      }
+      style: { height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '18px' }
     },
       React.createElement('style', null, '@keyframes cs-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }'),
       React.createElement('span', {
-        style: {
-          fontFamily: FONT_PIXEL, fontSize: '10px', color: ACCENT,
-          letterSpacing: '4px', animation: 'cs-pulse 1.4s ease-in-out infinite'
-        }
+        style: { fontFamily: FONT_PIXEL, fontSize: '10px', color: ACCENT, letterSpacing: '4px', animation: 'cs-pulse 1.4s ease-in-out infinite' }
       }, 'CARGANDO...'),
-      React.createElement('div', { style: { width: '160px', height: '1px', background: `linear-gradient(90deg, transparent, ${ACCENT}, transparent)`, animation: 'cs-pulse 1.4s ease-in-out infinite' } })
+      React.createElement('div', {
+        style: { width: '160px', height: '1px', background: `linear-gradient(90deg, transparent, ${ACCENT}, transparent)`, animation: 'cs-pulse 1.4s ease-in-out infinite' }
+      })
     );
   }
 
   if (status === 'error') {
     return React.createElement('div', {
-      style: {
-        height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: FONT_MONO, color: ACCENT, fontSize: '12px', letterSpacing: '2px'
-      }
+      style: { height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT_MONO, color: ACCENT, fontSize: '12px', letterSpacing: '2px' }
     }, errorMsg);
   }
 
@@ -198,6 +206,10 @@ function App() {
     onShift:       doShift,
     onSave:        () => handleSaveFont(fontData),
     onBack:        () => window.location.replace('feed.html'),
+    onPublish:     handlePublish,
+    isPublishing,
+    publishedOk,
+    onResetPublish: () => setPublishedOk(false),
     projectName:   proyectoNombre
   });
 }

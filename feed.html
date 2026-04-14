@@ -181,6 +181,34 @@
     }
     .btn-google img { width: 16px; height: 16px; filter: var(--icon-filter); }
     .btn-google:hover { background: var(--surface3); }
+
+    /* ── Grid size selector ── */
+    .modal-section-label {
+      font-size: 8px; letter-spacing: 2px; color: var(--muted);
+      font-family: var(--mono); margin: 16px 0 8px;
+    }
+    .grid-size-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 20px;
+    }
+    .grid-size-btn {
+      display: flex; flex-direction: column; align-items: center; padding: 10px 4px;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-btn);
+      cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--muted); transition: all .15s; line-height: 1.4; gap: 2px;
+    }
+    .grid-size-btn span { font-size: 8px; font-weight: 400; color: var(--muted2); letter-spacing: 1px; }
+    .grid-size-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .grid-size-btn.active span { color: rgba(255,255,255,0.7); }
+    .grid-size-btn:hover:not(.active) { border-color: var(--border2); color: var(--text); background: var(--surface3); }
+
+    /* ── Card rename ── */
+    .card-title-row { display: flex; align-items: center; gap: 6px; }
+    .btn-edit-name {
+      background: none; border: none; padding: 2px; cursor: pointer;
+      display: flex; align-items: center; opacity: 0; transition: opacity .15s; flex-shrink: 0;
+    }
+    .card:hover .btn-edit-name, .btn-edit-name:focus { opacity: 1; }
+
   </style>
 </head>
 <body>
@@ -296,6 +324,13 @@
       <p class="modal-subtitle">Ponle un nombre a tu proyecto</p>
       <input class="modal-input" type="text" id="new-font-name" placeholder="mi-fuente-pixel" maxlength="40">
       <p class="modal-hint">Solo letras, números y guiones</p>
+      <div class="modal-section-label">TAMAÑO DEL LIENZO</div>
+      <div class="grid-size-grid">
+        <button class="grid-size-btn" data-size="8">8×8<span>Micro</span></button>
+        <button class="grid-size-btn" data-size="16">16×16<span>Estándar</span></button>
+        <button class="grid-size-btn" data-size="32">32×32<span>Detallado</span></button>
+        <button class="grid-size-btn" data-size="64">64×64<span>HD</span></button>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancel" id="close-modal">CANCELAR</button>
         <button class="btn-confirm" id="confirm-create">CREAR</button>
@@ -372,14 +407,19 @@
       const onOpen = (proyecto) => { sessionStorage.setItem('proyectoActivo', JSON.stringify(proyecto)); window.location.href = 'editor.html'; };
       const onDelete = async (id) => {
         await deleteDoc(doc(db, 'usuarios', user.uid, 'proyectos', id));
-        const p = await cargarProyectos(user); renderFeed(p, onOpen, onDelete); updateCount(p.length);
+        const p = await cargarProyectos(user); renderFeed(p, onOpen, onDelete, onRename); updateCount(p.length);
+      };
+      const onRename = async (id, newName) => {
+        try {
+          await setDoc(doc(db, 'usuarios', user.uid, 'proyectos', id), { nombre: newName, updatedAt: new Date() }, { merge: true });
+        } catch(err) { console.error('Error al renombrar:', err); }
       };
       const onCreate = async (nombre, size) => {
         const id = Date.now().toString();
         await setDoc(doc(db, 'usuarios', user.uid, 'proyectos', id), { nombre, gridSize: size, font: {}, updatedAt: new Date() });
-        const p = await cargarProyectos(user); renderFeed(p, onOpen, onDelete); updateCount(p.length);
+        const p = await cargarProyectos(user); renderFeed(p, onOpen, onDelete, onRename); updateCount(p.length);
       };
-      return { onOpen, onDelete, onCreate };
+      return { onOpen, onDelete, onCreate, onRename };
     }
 
     function updateCount(n) {
@@ -420,7 +460,7 @@
       show('screen-app');
       const { onOpen, onDelete, onCreate } = makeCallbacks(user);
       const proyectos = await cargarProyectos(user);
-      renderFeed(proyectos, onOpen, onDelete);
+      renderFeed(proyectos, onOpen, onDelete, onRename);
       updateCount(proyectos.length);
       initFeedEvents(onCreate);
     });

@@ -36,40 +36,61 @@ export function shiftGrid(grid, size, dir) {
   return next;
 }
 
-/** Exportar font data → opentype.Font y descargar */
-export function buildAndDownload(fontData, gridSize, filename, format) {
-  // opentype.js importado globalmente desde App.js
+/**
+ * Exportar font data → opentype.Font y descargar
+ * @param {Object} meta - { fontName, author, letterSpacing, wordSpacing, unitsPerEm, ascender, descender }
+ */
+export function buildAndDownload(fontData, gridSize, filename, format, meta = {}) {
   const ot = window.__opentype__;
   if (!ot) { console.error('opentype not found'); return; }
 
+  const {
+    fontName      = filename,
+    author        = '',
+    letterSpacing = 0,
+    wordSpacing   = 10,
+    unitsPerEm    = 1000,
+    ascender      = 800,
+    descender     = -200,
+  } = meta;
+
+  const S = 100;
+  const baseAdvance = gridSize * S + letterSpacing * 10;
+
   const glyphs = [
-    new ot.Glyph({ name: '.notdef', unicode: 0, advanceWidth: 650, path: new ot.Path() })
+    new ot.Glyph({ name: '.notdef', unicode: 0, advanceWidth: baseAdvance, path: new ot.Path() })
   ];
 
   Object.keys(fontData).forEach(char => {
     const path = new ot.Path();
-    const s    = 100;
     (fontData[char] || []).forEach((on, i) => {
       if (!on) return;
-      const x = (i % gridSize) * s;
-      const y = (gridSize - 1 - Math.floor(i / gridSize)) * s;
-      path.moveTo(x, y); path.lineTo(x+s, y);
-      path.lineTo(x+s, y+s); path.lineTo(x, y+s);
+      const x = (i % gridSize) * S;
+      const y = (gridSize - 1 - Math.floor(i / gridSize)) * S;
+      path.moveTo(x, y); path.lineTo(x+S, y);
+      path.lineTo(x+S, y+S); path.lineTo(x, y+S);
       path.close();
     });
+    const advance = char === ' '
+      ? Math.max(200, gridSize * 60 + wordSpacing * 10)
+      : baseAdvance;
     glyphs.push(new ot.Glyph({
       name: char === ' ' ? 'space' : char,
       unicode: char.charCodeAt(0),
-      advanceWidth: gridSize * 110,
+      advanceWidth: advance,
       path
     }));
   });
 
   const font = new ot.Font({
-    familyName: filename, styleName: 'Regular',
-    unitsPerEm: 1000, ascender: 800, descender: -200, glyphs
+    familyName:  fontName || filename,
+    styleName:   'Regular',
+    designer:    author,
+    unitsPerEm,
+    ascender,
+    descender,
+    glyphs
   });
 
-  // opentype.js siempre genera OTF binario; cambiamos solo la extensión
   font.download(`${filename}.${format}`);
 }
