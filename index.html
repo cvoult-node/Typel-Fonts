@@ -1,199 +1,126 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Codeshelf — Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
+    /* inline vars since no shared.css navbar needed here */
     :root {
+      --bg:      #f4f2fa;
+      --surface: #ffffff;
+      --surf2:   #ebe8f5;
+      --surf3:   #ddd9ef;
+      --accent:  #bf4545;
+      --acc-h:   #a83a3a;
+      --border:  rgba(80,60,130,0.12);
+      --brd2:    rgba(80,60,130,0.20);
+      --text:    #18141f;
+      --muted:   #6b6480;
+      --mono:    'Space Mono', monospace;
+      --pixel:   'Press Start 2P', cursive;
+    }
+    .dark {
       --bg:      #0a0810;
       --surface: #110f1c;
       --surf2:   #1c1a2a;
       --surf3:   #252336;
-      --accent:  #bf4545;
       --acc-h:   #d45555;
-      --acc2:    rgba(191,69,69,0.10);
       --border:  rgba(200,185,230,0.07);
       --brd2:    rgba(200,185,230,0.14);
       --text:    #eae5f5;
       --muted:   #7e7894;
-      --mono:    'Space Mono', monospace;
-      --pixel:   'Press Start 2P', cursive;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--mono);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      /* subtle noise texture via gradient */
-      background-image: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(191,69,69,0.06) 0%, transparent 70%);
+      background: var(--bg); color: var(--text); font-family: var(--mono);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px;
+      background-image: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(191,69,69,0.05) 0%, transparent 70%);
+      transition: background .25s, color .25s;
     }
 
     .box {
-      width: 100%;
-      max-width: 360px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 44px 36px 40px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+      width: 100%; max-width: 360px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 44px 36px 40px;
+      box-shadow: 0 20px 60px rgba(80,60,130,0.12), 0 2px 8px rgba(0,0,0,0.05);
     }
+    .dark .box { box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4); }
 
-    /* ── Logo ── */
-    .logo {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .logo-mark {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo-text {
-      font-family: var(--pixel);
-      font-size: 16px;
-      color: var(--accent);
-      line-height: 2;
-      letter-spacing: 4px;
-    }
-    .logo-sep {
-      width: 32px;
-      height: 1px;
-      background: var(--border);
-    }
-    .tagline {
-      font-size: 7px;
-      letter-spacing: 5px;
-      color: var(--muted);
-      font-family: var(--mono);
-    }
+    .logo { text-align: center; margin-bottom: 36px; }
+    .logo-mark { display: inline-flex; flex-direction: column; align-items: center; gap: 12px; }
+    .logo-text { font-family: var(--pixel); font-size: 16px; color: var(--accent); line-height: 2; letter-spacing: 4px; }
+    .logo-sep  { width: 32px; height: 1px; background: var(--border); }
+    .tagline   { font-size: 7px; letter-spacing: 5px; color: var(--muted); }
 
-    /* ── Form ── */
     .form { display: flex; flex-direction: column; gap: 10px; }
-
-    .field-wrap { position: relative; }
-
     input {
-      width: 100%;
-      background: var(--surf2);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 13px 15px;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 13px;
-      outline: none;
+      width: 100%; background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 13px 15px; color: var(--text);
+      font-family: var(--mono); font-size: 13px; outline: none;
       transition: border-color .18s, background .18s;
     }
-    input:focus {
-      border-color: var(--accent);
-      background: var(--surf3);
-    }
+    input:focus { border-color: var(--accent); background: var(--surf3); }
     input::placeholder { color: var(--muted); }
 
     .btn-main {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 7px;
-      padding: 14px;
-      font-family: var(--mono);
-      font-weight: 700;
-      font-size: 10px;
-      letter-spacing: 2.5px;
-      cursor: pointer;
-      margin-top: 6px;
+      background: var(--accent); color: #fff; border: none; border-radius: 7px;
+      padding: 14px; font-family: var(--mono); font-weight: 700; font-size: 10px;
+      letter-spacing: 2.5px; cursor: pointer; margin-top: 6px;
       transition: background .15s, transform .12s;
     }
     .btn-main:hover { background: var(--acc-h); transform: translateY(-1px); }
     .btn-main:active { transform: translateY(0); }
     .btn-main:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    /* ── Divider ── */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 22px 0;
-    }
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    .divider-text {
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: var(--muted);
-    }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 22px 0; }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text { font-size: 9px; letter-spacing: 2px; color: var(--muted); }
 
-    /* ── Google btn ── */
     .btn-google {
-      width: 100%;
-      padding: 13px;
-      background: var(--surf2);
-      border: 1px solid var(--brd2);
-      border-radius: 7px;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
+      width: 100%; padding: 13px; background: var(--surf2); border: 1px solid var(--brd2);
+      border-radius: 7px; color: var(--text); font-family: var(--mono);
+      font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
       transition: background .15s, border-color .15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
     }
-    .btn-google:hover {
-      background: var(--surf3);
-      border-color: rgba(200,185,230,0.22);
-    }
+    .btn-google img { width: 16px; height: 16px; }
+    .dark .btn-google img { filter: invert(1) brightness(0.85); }
+    .btn-google:hover { background: var(--surf3); border-color: rgba(130,100,200,0.22); }
 
-    /* ── Error ── */
     .error {
-      color: var(--accent);
-      font-size: 9px;
-      margin-top: 14px;
-      text-align: center;
-      display: none;
-      line-height: 1.8;
-      letter-spacing: 1px;
+      color: var(--accent); font-size: 9px; margin-top: 14px; text-align: center;
+      display: none; line-height: 1.8; letter-spacing: 1px;
     }
 
-    /* ── Loading ── */
     .loading {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
+      height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
     }
-    .loading-text {
-      font-family: var(--pixel);
-      font-size: 10px;
-      color: var(--accent);
-      letter-spacing: 4px;
-      animation: pulse 1.4s infinite;
-    }
-    .loading-bar {
-      width: 120px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      animation: pulse 1.4s infinite;
-    }
+    .loading-text { font-family: var(--pixel); font-size: 10px; color: var(--accent); letter-spacing: 4px; animation: pulse 1.4s infinite; }
+    .loading-bar  { width: 120px; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: pulse 1.4s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-
     .hidden { display: none !important; }
+
+    /* Theme toggle in corner */
+    .theme-toggle {
+      position: fixed; top: 16px; right: 16px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .15s;
+    }
+    .theme-toggle:hover { background: var(--surf2); }
+    .theme-toggle img { width: 16px; height: 16px; }
+    .dark .theme-toggle img { filter: invert(1) brightness(0.85); }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="btn-theme" title="Cambiar tema">
+    <img src="src/icons/theme.svg" alt="Tema">
+  </button>
+
   <div id="screen-loading" class="loading">
     <span class="loading-text">CARGANDO...</span>
     <div class="loading-bar"></div>
@@ -210,12 +137,8 @@
       </div>
 
       <form class="form" id="auth-form">
-        <div class="field-wrap">
-          <input type="email"    id="inp-email"    placeholder="Email" autocomplete="email" required>
-        </div>
-        <div class="field-wrap">
-          <input type="password" id="inp-password" placeholder="Contraseña" autocomplete="current-password" required>
-        </div>
+        <input type="email"    id="inp-email"    placeholder="Email" autocomplete="email" required>
+        <input type="password" id="inp-password" placeholder="Contraseña" autocomplete="current-password" required>
         <button type="submit" class="btn-main" id="btn-submit">ENTRAR / REGISTRAR</button>
       </form>
 
@@ -225,7 +148,9 @@
         <div class="divider-line"></div>
       </div>
 
-      <button class="btn-google" id="btn-google">🔑&nbsp;&nbsp;Continuar con Google</button>
+      <button class="btn-google" id="btn-google">
+        <img src="src/icons/user.svg" alt="">Continuar con Google
+      </button>
       <p class="error" id="auth-error"></p>
     </div>
   </div>
@@ -234,6 +159,12 @@
     import { auth, provider, signInWithPopup, onAuthStateChanged,
              signInWithEmailAndPassword, createUserWithEmailAndPassword
            } from './src/firebase.js';
+
+    // ── Theme ─────────────────────────────────
+    function getTheme() { return localStorage.getItem('cs-theme') || 'light'; }
+    function applyTheme(t) { document.documentElement.className = t; localStorage.setItem('cs-theme', t); }
+    applyTheme(getTheme());
+    document.getElementById('btn-theme').onclick = () => applyTheme(document.documentElement.className === 'dark' ? 'light' : 'dark');
 
     const hide = id => document.getElementById(id).classList.add('hidden');
     const show = id => document.getElementById(id).classList.remove('hidden');
@@ -255,12 +186,8 @@
       const pass  = document.getElementById('inp-password').value;
       const btn   = document.getElementById('btn-submit');
       btn.disabled = true; btn.textContent = '...';
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-      } catch {
-        try { await createUserWithEmailAndPassword(auth, email, pass); }
-        catch (err) { showError(err.message); }
-      }
+      try { await signInWithEmailAndPassword(auth, email, pass); }
+      catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch (err) { showError(err.message); } }
       btn.disabled = false; btn.textContent = 'ENTRAR / REGISTRAR';
     };
 

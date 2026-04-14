@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Codeshelf | Mis Proyectos</title>
+  <title>Codeshelf | Mis Fuentes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -11,103 +11,175 @@
   <style>
     body {
       overflow-y: scroll; min-height: 100vh;
-      background-image: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(191,69,69,0.05) 0%, transparent 70%);
+      background-image: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(191,69,69,0.04) 0%, transparent 70%);
     }
 
-    /* FEED */
+    /* ── Feed layout ── */
     .feed-container { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
-
     .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 12px; }
     .feed-header-left { display: flex; align-items: baseline; gap: 12px; }
     .feed-title { font-family: var(--pixel); font-size: 10px; color: var(--text); letter-spacing: 2px; }
     .feed-count { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
 
-    /* View toggle */
+    /* ── View toggle ── */
     .view-toggle { display: flex; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-btn); padding: 3px; }
     .view-btn { width: 28px; height: 26px; border: none; background: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .13s; }
     .view-btn img { width: 13px; height: 13px; filter: var(--icon-filter); opacity: .4; transition: opacity .13s; }
     .view-btn.active { background: var(--surface3); }
-    .view-btn.active img, .view-btn:hover img { opacity: .9; }
+    .view-btn.active img, .view-btn:hover img { opacity: .85; }
 
-    /* New project btn */
+    /* ── New project button ── */
     .new-project-btn {
-      border: 1px dashed var(--border2); border-radius: var(--r-card);
+      border: 1.5px dashed var(--border2); border-radius: var(--r-card);
       padding: 16px 20px; display: flex; align-items: center; gap: 16px;
-      cursor: pointer; margin-bottom: 18px;
+      cursor: pointer; margin-bottom: 20px;
       transition: border-color .18s, background .18s, transform .12s;
       background: none; width: 100%; text-align: left; color: var(--text); font-family: var(--mono);
     }
     .new-project-btn:hover { border-color: var(--accent); background: var(--accent3); transform: translateY(-1px); }
-    .plus-square { width: 38px; height: 38px; background: var(--accent); border-radius: var(--r-btn); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s; }
+    .plus-square {
+      width: 40px; height: 40px; background: var(--accent); border-radius: var(--r-btn);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s;
+    }
     .plus-square img { width: 18px; height: 18px; filter: invert(1); }
     .new-project-btn:hover .plus-square { background: var(--accent-h); }
+    .new-project-label { font-weight: 700; font-size: 13px; color: var(--text); }
     .new-project-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
 
-    /* LIST VIEW (default) */
+    /* ── Project list ── */
     #projects-list { display: flex; flex-direction: column; gap: 12px; }
-
-    /* GRID VIEW */
     #projects-list.grid-view { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 
-    /* Card */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); overflow: hidden; transition: border-color .18s, transform .15s, box-shadow .18s; box-shadow: var(--shadow-card); }
+    /* ── Card ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card);
+      overflow: hidden; transition: border-color .18s, transform .15s, box-shadow .18s;
+      box-shadow: var(--shadow-card);
+    }
     .card:hover { border-color: var(--border-accent); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
     .card-top-line { height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
-    .card-inner { padding: 16px; }
-    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .card-icon { width: 36px; height: 36px; background: var(--accent2); border-radius: 50%; border: 1px solid var(--border-accent); display: flex; align-items: center; justify-content: center; font-family: var(--pixel); font-size: 11px; color: var(--accent); flex-shrink: 0; }
+    .card-inner { padding: 18px 18px 16px; }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .card-icon {
+      width: 38px; height: 38px; background: var(--accent2); border-radius: 50%;
+      border: 1px solid var(--border-accent); display: flex; align-items: center;
+      justify-content: center; font-family: var(--pixel); font-size: 11px; color: var(--accent); flex-shrink: 0;
+    }
     .p-title { font-weight: 700; font-size: 13px; color: var(--text); }
     .p-meta  { font-size: 9px; color: var(--muted); letter-spacing: 2px; margin-top: 4px; }
-    .card-preview { background: #080610; border-radius: var(--r-btn); padding: 12px; margin-bottom: 12px; display: flex; gap: 10px; min-height: 44px; align-items: center; justify-content: center; border: 1px solid var(--border); }
-    .card-actions { display: flex; gap: 8px; }
-    .btn-open { flex: 1; background: var(--accent); color: #fff; border: none; border-radius: var(--r-btn); padding: 9px; font-family: var(--mono); font-weight: 700; font-size: 10px; letter-spacing: 2px; cursor: pointer; transition: background .15s, transform .12s; }
-    .btn-open:hover { background: var(--accent-h); transform: translateY(-1px); }
-    .btn-del { width: 36px; height: 36px; background: transparent; border: 1px solid var(--border); border-radius: var(--r-btn); color: var(--muted2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s, border-color .15s, color .15s; padding: 0; }
-    .btn-del:hover { background: rgba(191,69,69,0.08); border-color: var(--border-accent); color: var(--accent); }
-    .btn-del svg { pointer-events: none; }
 
-    /* Grid view compact */
+    .card-preview {
+      background: var(--canvas-bg); border-radius: var(--r-btn); padding: 12px;
+      margin-bottom: 14px; display: flex; gap: 10px; min-height: 46px;
+      align-items: center; justify-content: center; border: 1px solid var(--border);
+    }
+
+    .card-actions { display: flex; gap: 8px; }
+    .btn-open {
+      flex: 1; background: var(--accent); color: #fff; border: none;
+      border-radius: var(--r-btn); padding: 9px; font-family: var(--mono);
+      font-weight: 700; font-size: 10px; letter-spacing: 2px; cursor: pointer;
+      transition: background .15s, transform .12s;
+    }
+    .btn-open:hover { background: var(--accent-h); transform: translateY(-1px); }
+    .btn-del {
+      width: 36px; height: 36px; background: transparent; border: 1px solid var(--border);
+      border-radius: var(--r-btn); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: background .15s, border-color .15s; padding: 0;
+    }
+    .btn-del img { width: 15px; height: 15px; filter: var(--icon-filter); opacity: .45; transition: opacity .15s; }
+    .btn-del:hover { background: rgba(191,69,69,0.08); border-color: var(--border-accent); }
+    .btn-del:hover img { opacity: .9; filter: none; }
+
     #projects-list.grid-view .card-inner { padding: 14px; }
     #projects-list.grid-view .p-title { font-size: 12px; }
     #projects-list.grid-view .card-preview { padding: 10px; min-height: 36px; }
 
-    /* Empty */
-    .empty-state { text-align: center; padding: 70px 20px; color: var(--muted); font-size: 10px; letter-spacing: 3px; grid-column: 1 / -1; }
-    .empty-state span { display: block; font-size: 32px; margin-bottom: 16px; opacity: 0.3; }
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 70px 20px; color: var(--muted);
+      font-size: 10px; letter-spacing: 3px; grid-column: 1 / -1;
+    }
+    .empty-icon {
+      width: 48px; height: 48px; margin: 0 auto 18px; opacity: 0.25;
+      filter: var(--icon-filter);
+    }
+    .empty-title { font-family: var(--pixel); font-size: 10px; letter-spacing: 2px; margin-bottom: 10px; }
+    .empty-sub { font-size: 9px; color: var(--muted2); }
 
-    /* MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 16px; backdrop-filter: blur(8px); }
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999; padding: 16px; backdrop-filter: blur(8px);
+    }
     .modal-overlay.hidden { display: none; }
-    .modal-box { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r-card); padding: 32px 28px; width: 100%; max-width: 340px; box-shadow: 0 32px 80px rgba(0,0,0,0.7); }
+    .modal-box {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--r-card); padding: 32px 28px; width: 100%;
+      max-width: 340px; box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+    }
     .modal-title { font-family: var(--pixel); font-size: 11px; color: var(--accent); margin-bottom: 8px; letter-spacing: 2px; }
     .modal-subtitle { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-bottom: 24px; }
-    .modal-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-btn); padding: 12px 14px; color: var(--text); font-family: var(--mono); font-size: 13px; outline: none; margin-bottom: 8px; transition: border-color .15s, background .15s; }
+    .modal-input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-btn); padding: 12px 14px; color: var(--text);
+      font-family: var(--mono); font-size: 13px; outline: none; margin-bottom: 8px;
+      transition: border-color .15s, background .15s;
+    }
     .modal-input:focus { border-color: var(--accent); background: var(--surface3); }
     .modal-input::placeholder { color: var(--muted2); }
     .modal-hint { font-size: 9px; color: var(--muted2); letter-spacing: 1px; margin-bottom: 22px; }
     .modal-actions { display: flex; gap: 8px; }
-    .btn-cancel { flex: 1; background: none; border: 1px solid var(--border); border-radius: var(--r-btn); color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: 2px; padding: 11px; cursor: pointer; transition: border-color .15s, color .15s; }
+    .btn-cancel {
+      flex: 1; background: none; border: 1px solid var(--border); border-radius: var(--r-btn);
+      color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+      padding: 11px; cursor: pointer; transition: border-color .15s, color .15s;
+    }
     .btn-cancel:hover { border-color: var(--border2); color: var(--text); }
-    .btn-confirm { flex: 2; background: var(--accent); border: none; border-radius: var(--r-btn); color: #fff; font-family: var(--mono); font-weight: 700; font-size: 10px; letter-spacing: 2px; padding: 11px; cursor: pointer; transition: background .15s, transform .12s; }
+    .btn-confirm {
+      flex: 2; background: var(--accent); border: none; border-radius: var(--r-btn);
+      color: #fff; font-family: var(--mono); font-weight: 700; font-size: 10px;
+      letter-spacing: 2px; padding: 11px; cursor: pointer;
+      transition: background .15s, transform .12s;
+    }
     .btn-confirm:hover { background: var(--accent-h); transform: translateY(-1px); }
     .btn-confirm:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    /* AUTH FALLBACK */
+    /* ── Auth fallback ── */
     .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .auth-box { width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 44px 36px 40px; box-shadow: 0 32px 80px rgba(0,0,0,0.6); }
+    .auth-box {
+      width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-card); padding: 44px 36px 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    }
     .auth-logo { text-align: center; margin-bottom: 36px; }
     .auth-logo-text { font-family: var(--pixel); font-size: 16px; color: var(--accent); line-height: 2; letter-spacing: 4px; }
     .auth-tagline { font-size: 7px; letter-spacing: 5px; color: var(--muted); margin-top: 10px; }
     .auth-form { display: flex; flex-direction: column; gap: 10px; }
-    .auth-input { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-btn); padding: 13px 15px; color: var(--text); font-family: var(--mono); font-size: 13px; outline: none; transition: border-color .15s; width: 100%; }
+    .auth-input {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-btn);
+      padding: 13px 15px; color: var(--text); font-family: var(--mono); font-size: 13px;
+      outline: none; transition: border-color .15s; width: 100%;
+    }
     .auth-input:focus { border-color: var(--accent); }
     .auth-input::placeholder { color: var(--muted); }
-    .btn-auth { background: var(--accent); color: #fff; border: none; border-radius: var(--r-btn); padding: 14px; font-family: var(--mono); font-weight: 700; font-size: 10px; letter-spacing: 2.5px; cursor: pointer; margin-top: 6px; transition: background .15s; }
+    .btn-auth {
+      background: var(--accent); color: #fff; border: none; border-radius: var(--r-btn);
+      padding: 14px; font-family: var(--mono); font-weight: 700; font-size: 10px;
+      letter-spacing: 2.5px; cursor: pointer; margin-top: 6px; transition: background .15s;
+    }
     .btn-auth:hover { background: var(--accent-h); }
     .auth-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0; }
     .auth-divider-line { flex: 1; height: 1px; background: var(--border); }
     .auth-divider-text { font-size: 9px; letter-spacing: 2px; color: var(--muted); }
-    .btn-google { width: 100%; padding: 13px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--r-btn); color: var(--text); font-family: var(--mono); font-size: 11px; font-weight: 700; cursor: pointer; transition: background .15s; }
+    .btn-google {
+      width: 100%; padding: 13px; background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--r-btn); color: var(--text); font-family: var(--mono);
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      transition: background .15s; display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-google img { width: 16px; height: 16px; filter: var(--icon-filter); }
     .btn-google:hover { background: var(--surface3); }
   </style>
 </head>
@@ -134,7 +206,9 @@
         <span class="auth-divider-text">O</span>
         <div class="auth-divider-line"></div>
       </div>
-      <button class="btn-google" id="btn-google">🔑&nbsp;&nbsp;Continuar con Google</button>
+      <button class="btn-google" id="btn-google">
+        <img src="src/icons/user.svg" alt="">Continuar con Google
+      </button>
       <p id="auth-error" style="color:var(--accent);font-size:9px;margin-top:14px;text-align:center;display:none;"></p>
     </div>
   </div>
@@ -144,12 +218,9 @@
       <span class="navbar-logo" style="cursor:default;">CODESHELF</span>
       <div class="navbar-links">
         <a href="social.html" class="nav-link">EXPLORAR</a>
-
         <div class="nav-avatar-wrap">
-          <div class="nav-avatar" id="nav-avatar" tabindex="0" role="button">U</div>
-
+          <div class="nav-avatar" id="nav-avatar" tabindex="0" role="button" aria-label="Menú de usuario">U</div>
           <div class="nav-dropdown" id="nav-dropdown">
-
             <div class="dd-user">
               <div class="dd-avatar-sm" id="dd-avatar-sm">U</div>
               <div>
@@ -157,7 +228,6 @@
                 <div class="dd-user-email" id="dd-user-email">—</div>
               </div>
             </div>
-
             <div class="dd-section">
               <div class="dd-label">NAVEGAR</div>
               <a href="social.html" class="dd-item">
@@ -167,30 +237,25 @@
                 <img class="dd-icon" src="src/icons/fonts.svg" alt="">Mis fuentes
               </a>
             </div>
-
             <div class="dd-section">
               <div class="dd-label">CREAR</div>
               <button class="dd-item" id="dd-new-font">
                 <img class="dd-icon" src="src/icons/plus.svg" alt="">Nueva fuente
               </button>
-              <a href="social.html" class="dd-item">
-                <img class="dd-icon" src="src/icons/publish.svg" alt="">Publicaciones
-              </a>
             </div>
-
             <div class="dd-section">
               <div class="dd-label">CUENTA</div>
               <a href="profile.html" class="dd-item">
-                <img class="dd-icon" src="src/user.svg" alt="">Mi perfil
+                <img class="dd-icon" src="src/icons/user.svg" alt="">Mi perfil
               </a>
               <button class="dd-item" id="dd-theme">
-                <img class="dd-icon" src="src/icons/theme.svg" alt=""><span id="dd-theme-label">Cambiar tema</span>
+                <img class="dd-icon" src="src/icons/theme.svg" id="dd-theme-icon" alt="">
+                <span id="dd-theme-label">Tema oscuro</span>
               </button>
               <button class="dd-item danger" id="dd-logout">
                 <img class="dd-icon" src="src/icons/logout.svg" alt="">Cerrar sesión
               </button>
             </div>
-
           </div>
         </div>
       </div>
@@ -215,7 +280,7 @@
       <button class="new-project-btn" id="btn-new-font">
         <div class="plus-square"><img src="src/icons/plus.svg" alt="Agregar"></div>
         <div>
-          <p style="font-weight:700;font-size:13px;color:var(--text);">Nueva fuente</p>
+          <p class="new-project-label">Nueva fuente</p>
           <p class="new-project-sub">Crea un nuevo proyecto de pixel font</p>
         </div>
       </button>
@@ -224,6 +289,7 @@
     </main>
   </div>
 
+  <!-- Modal nueva fuente -->
   <div class="modal-overlay hidden" id="modal-overlay">
     <div class="modal-box">
       <p class="modal-title">NUEVA FUENTE</p>
@@ -249,16 +315,15 @@
     const show = id => document.getElementById(id).classList.remove('hidden');
     const hide = id => document.getElementById(id).classList.add('hidden');
 
-    // ── TEMA ──────────────────────────────────────────────────────────────
-    function getTheme() {
-      return localStorage.getItem('cs-theme') ||
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    }
+    // ── Theme ──────────────────────────────────────────────────────────────
+    function getTheme() { return localStorage.getItem('cs-theme') || 'light'; }
     function applyTheme(t) {
       document.documentElement.className = t;
       localStorage.setItem('cs-theme', t);
-      const lbl = document.getElementById('dd-theme-label');
-      if (lbl) lbl.textContent = t === 'dark' ? 'Tema claro' : 'Tema oscuro';
+      const lbl  = document.getElementById('dd-theme-label');
+      const icon = document.getElementById('dd-theme-icon');
+      if (lbl)  lbl.textContent = t === 'dark' ? 'Tema claro' : 'Tema oscuro';
+      if (icon) icon.style.transform = t === 'dark' ? 'rotate(180deg)' : '';
     }
     applyTheme(getTheme());
 
@@ -267,45 +332,36 @@
       closeDropdown();
     };
 
-    // ── DROPDOWN ──────────────────────────────────────────────────────────
+    // ── Dropdown ───────────────────────────────────────────────────────────
     const avatarBtn = document.getElementById('nav-avatar');
     const dropdown  = document.getElementById('nav-dropdown');
-
-    function openDropdown()  { dropdown.classList.add('open'); avatarBtn.classList.add('open'); }
-    function closeDropdown() { dropdown.classList.remove('open'); avatarBtn.classList.remove('open'); }
-
-    avatarBtn.onclick = (e) => { e.stopPropagation(); dropdown.classList.contains('open') ? closeDropdown() : openDropdown(); };
-    document.addEventListener('click',   e  => { if (!dropdown.contains(e.target) && e.target !== avatarBtn) closeDropdown(); });
-    document.addEventListener('keydown', e  => { if (e.key === 'Escape') closeDropdown(); });
-
+    const openDropdown  = () => { dropdown.classList.add('open'); avatarBtn.classList.add('open'); };
+    const closeDropdown = () => { dropdown.classList.remove('open'); avatarBtn.classList.remove('open'); };
+    avatarBtn.onclick = e => { e.stopPropagation(); dropdown.classList.contains('open') ? closeDropdown() : openDropdown(); };
+    document.addEventListener('click',   e => { if (!dropdown.contains(e.target) && e.target !== avatarBtn) closeDropdown(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDropdown(); });
     document.getElementById('dd-new-font').onclick = () => {
       closeDropdown();
       document.getElementById('modal-overlay').classList.remove('hidden');
-      document.getElementById('new-font-name').value = '';
-      document.getElementById('new-font-name').focus();
+      document.getElementById('new-font-name').value = ''; document.getElementById('new-font-name').focus();
     };
     document.getElementById('dd-logout').onclick = () => signOut(auth).then(() => window.location.reload());
 
-    // ── TOGGLE VISTA ──────────────────────────────────────────────────────
+    // ── View toggle ────────────────────────────────────────────────────────
     let currentView = localStorage.getItem('cs-feed-view') || 'list';
-
     function setView(v) {
-      currentView = v;
-      localStorage.setItem('cs-feed-view', v);
+      currentView = v; localStorage.setItem('cs-feed-view', v);
       const list = document.getElementById('projects-list');
       const btnL = document.getElementById('btn-view-list');
       const btnG = document.getElementById('btn-view-grid');
-      if (v === 'grid') {
-        list.classList.add('grid-view'); btnG.classList.add('active'); btnL.classList.remove('active');
-      } else {
-        list.classList.remove('grid-view'); btnL.classList.add('active'); btnG.classList.remove('active');
-      }
+      if (v === 'grid') { list.classList.add('grid-view'); btnG.classList.add('active'); btnL.classList.remove('active'); }
+      else              { list.classList.remove('grid-view'); btnL.classList.add('active'); btnG.classList.remove('active'); }
     }
     setView(currentView);
     document.getElementById('btn-view-list').onclick = () => setView('list');
     document.getElementById('btn-view-grid').onclick = () => setView('grid');
 
-    // ── FIRESTORE ─────────────────────────────────────────────────────────
+    // ── Firestore ──────────────────────────────────────────────────────────
     async function cargarProyectos(user) {
       const q   = query(collection(db, 'usuarios', user.uid, 'proyectos'), orderBy('updatedAt', 'desc'));
       const snp = await getDocs(q);
@@ -331,25 +387,31 @@
       if (el) el.textContent = `${n} PROYECTO${n !== 1 ? 'S' : ''}`;
     }
 
-    // ── AUTH STATE ────────────────────────────────────────────────────────
+    // ── Auth state ─────────────────────────────────────────────────────────
     onAuthStateChanged(auth, async (user) => {
       hide('screen-loading');
       if (!user) { show('screen-auth'); return; }
 
-      const initial = (user.email || '?')[0].toUpperCase();
+      // Avatar hydration
+      let initial = (user.email || '?')[0].toUpperCase();
       document.getElementById('nav-avatar').textContent   = initial;
       document.getElementById('dd-avatar-sm').textContent = initial;
       document.getElementById('dd-user-email').textContent = user.email || '';
-
       try {
-        const snap = await getDoc(doc(db, 'usuarios', user.uid, 'config', 'perfil'));
-        const nombre = snap.exists() ? snap.data().displayName : null;
-        const display = nombre || user.email?.split('@')[0] || '—';
-        document.getElementById('dd-user-name').textContent = display;
-        if (nombre) {
-          const ini = nombre[0].toUpperCase();
-          document.getElementById('nav-avatar').textContent   = ini;
-          document.getElementById('dd-avatar-sm').textContent = ini;
+        const snap   = await getDoc(doc(db, 'usuarios', user.uid, 'config', 'perfil'));
+        const d      = snap.exists() ? snap.data() : {};
+        const nombre = d.displayName || user.email?.split('@')[0] || '—';
+        document.getElementById('dd-user-name').textContent = nombre;
+        if (d.displayName) {
+          initial = d.displayName[0].toUpperCase();
+          document.getElementById('nav-avatar').textContent   = initial;
+          document.getElementById('dd-avatar-sm').textContent = initial;
+        }
+        if (d.avatarColor) {
+          const av = document.getElementById('nav-avatar');
+          av.style.borderColor = d.avatarColor; av.style.color = d.avatarColor; av.style.background = d.avatarColor + '20';
+          const sm = document.getElementById('dd-avatar-sm');
+          sm.style.borderColor = d.avatarColor; sm.style.color = d.avatarColor; sm.style.background = d.avatarColor + '20';
         }
       } catch {
         document.getElementById('dd-user-name').textContent = user.email?.split('@')[0] || '—';
@@ -363,7 +425,7 @@
       initFeedEvents(onCreate);
     });
 
-    // ── AUTH FORM ────────────────────────────────────────────────────────
+    // ── Auth form ──────────────────────────────────────────────────────────
     document.getElementById('auth-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('auth-email').value.trim();
@@ -373,7 +435,6 @@
       try { await signInWithEmailAndPassword(auth, email, pass); }
       catch { try { await createUserWithEmailAndPassword(auth, email, pass); } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; } }
     });
-
     document.getElementById('btn-google').onclick = () =>
       signInWithPopup(auth, provider).catch(err => { const e = document.getElementById('auth-error'); e.textContent = err.message; e.style.display = 'block'; });
   </script>

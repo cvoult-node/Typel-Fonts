@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,168 +11,58 @@
       overflow-y: scroll;
       background-image: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(191,69,69,0.04) 0%, transparent 60%);
     }
-
-    .feed-wrap {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 28px 16px 64px;
-    }
-
-    .feed-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .feed-title {
-      font-family: var(--pixel);
-      font-size: 10px;
-      color: var(--text);
-      letter-spacing: 2px;
-    }
-    .feed-count {
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 2px;
-    }
+    .feed-wrap { max-width: 680px; margin: 0 auto; padding: 28px 16px 64px; }
+    .feed-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+    .feed-title { font-family: var(--pixel); font-size: 10px; color: var(--text); letter-spacing: 2px; }
+    .feed-count { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
 
     /* ── Post card ── */
     .post-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-card);
-      overflow: hidden;
-      margin-bottom: 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-card); overflow: hidden; margin-bottom: 16px;
       transition: border-color .18s, transform .15s, box-shadow .18s;
-      cursor: pointer;
-      box-shadow: var(--shadow-card);
+      cursor: pointer; box-shadow: var(--shadow-card);
     }
-    .post-card:hover {
-      border-color: var(--border-accent);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    .card-accent-line {
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), transparent);
-    }
-
+    .post-card:hover { border-color: var(--border-accent); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+    .card-accent-line { height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
     .card-body { padding: 20px; }
-
-    .card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .card-author {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .card-author { display: flex; align-items: center; gap: 12px; }
     .author-avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
+      width: 32px; height: 32px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--pixel); font-size: 8px;
-      border: 1.5px solid;
-      flex-shrink: 0;
+      font-family: var(--pixel); font-size: 8px; border: 1.5px solid; flex-shrink: 0;
     }
-
     .author-name { font-size: 12px; font-weight: 700; color: var(--text); }
-    .author-date {
-      font-size: 9px;
-      color: var(--muted);
-      margin-top: 2px;
-      letter-spacing: 1px;
-    }
-
+    .author-date { font-size: 9px; color: var(--muted); margin-top: 2px; letter-spacing: 1px; }
     .card-badge {
-      font-size: 8px;
-      letter-spacing: 2px;
-      color: var(--accent);
-      border: 1px solid var(--border-accent);
-      border-radius: 5px;
-      padding: 4px 8px;
-      background: var(--accent2);
+      font-size: 8px; letter-spacing: 2px; color: var(--accent);
+      border: 1px solid var(--border-accent); border-radius: 5px;
+      padding: 4px 8px; background: var(--accent2);
     }
-
-    /* Preview canvas area */
     .card-preview {
-      background: #07050f;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      padding: 16px;
-      margin-bottom: 16px;
-      min-height: 64px;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
+      background: var(--canvas-bg); border-radius: 8px; border: 1px solid var(--border);
+      padding: 16px; margin-bottom: 16px; min-height: 64px;
+      display: flex; align-items: center; overflow: hidden;
     }
     .card-preview canvas { image-rendering: pixelated; max-width: 100%; }
-
-    .card-meta-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .font-name {
-      font-family: var(--pixel);
-      font-size: 10px;
-      color: var(--text);
-      letter-spacing: 1px;
-    }
-    .font-stats {
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 2px;
-    }
-
-    .card-glyphs-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
-
+    .card-meta-row { display: flex; align-items: center; justify-content: space-between; }
+    .font-name { font-family: var(--pixel); font-size: 10px; color: var(--text); letter-spacing: 1px; }
+    .font-stats { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
+    .card-glyphs-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
     .btn-demo {
-      display: block;
-      width: 100%;
-      margin-top: 16px;
-      padding: 10px;
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--r-btn);
-      color: var(--muted);
-      font-family: var(--mono);
-      font-size: 9px;
-      letter-spacing: 2px;
-      cursor: pointer;
-      transition: border-color .15s, color .15s, background .15s;
-      text-align: center;
+      display: block; width: 100%; margin-top: 16px; padding: 10px;
+      background: none; border: 1px solid var(--border); border-radius: var(--r-btn);
+      color: var(--muted); font-family: var(--mono); font-size: 9px;
+      letter-spacing: 2px; cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s; text-align: center;
     }
-    .btn-demo:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent3);
-    }
+    .btn-demo:hover { border-color: var(--accent); color: var(--accent); background: var(--accent3); }
 
-    /* Empty state */
-    .empty {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--muted);
-    }
-    .empty-icon { font-size: 36px; margin-bottom: 16px; opacity: .25; }
-    .empty-title {
-      font-family: var(--pixel);
-      font-size: 10px;
-      letter-spacing: 3px;
-      margin-bottom: 10px;
-    }
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .empty-icon { width: 40px; height: 40px; margin: 0 auto 18px; opacity: .2; filter: var(--icon-filter); }
+    .empty-title { font-family: var(--pixel); font-size: 10px; letter-spacing: 3px; margin-bottom: 10px; }
     .empty-sub { font-size: 10px; color: var(--muted2); }
   </style>
 </head>
@@ -188,8 +78,41 @@
       <a href="social.html" class="navbar-logo">CODESHELF</a>
       <div class="navbar-links">
         <a href="social.html" class="nav-link active">EXPLORAR</a>
-        <span class="nav-link" id="nav-proyectos" style="display:none">MIS FUENTES</span>
-        <a href="profile.html" class="nav-avatar" id="nav-avatar">?</a>
+        <a href="feed.html"   class="nav-link" id="nav-feed">MIS FUENTES</a>
+        <div class="nav-avatar-wrap">
+          <div class="nav-avatar" id="nav-avatar" tabindex="0" role="button" aria-label="Menú de usuario">?</div>
+          <div class="nav-dropdown" id="nav-dropdown">
+            <div class="dd-user">
+              <div class="dd-avatar-sm" id="dd-avatar-sm">?</div>
+              <div>
+                <div class="dd-user-name"  id="dd-user-name">—</div>
+                <div class="dd-user-email" id="dd-user-email">—</div>
+              </div>
+            </div>
+            <div class="dd-section">
+              <div class="dd-label">NAVEGAR</div>
+              <a href="social.html" class="dd-item">
+                <img class="dd-icon" src="src/icons/explore.svg" alt="">Explorar fuentes
+              </a>
+              <a href="feed.html" class="dd-item">
+                <img class="dd-icon" src="src/icons/fonts.svg" alt="">Mis fuentes
+              </a>
+            </div>
+            <div class="dd-section">
+              <div class="dd-label">CUENTA</div>
+              <a href="profile.html" class="dd-item">
+                <img class="dd-icon" src="src/icons/user.svg" alt="">Mi perfil
+              </a>
+              <button class="dd-item" id="dd-theme">
+                <img class="dd-icon" src="src/icons/theme.svg" id="dd-theme-icon" alt="">
+                <span id="dd-theme-label">Tema oscuro</span>
+              </button>
+              <button class="dd-item danger" id="dd-logout">
+                <img class="dd-icon" src="src/icons/logout.svg" alt="">Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -203,7 +126,7 @@
   </div>
 
   <script type="module">
-    import { auth, db, onAuthStateChanged } from './src/firebase.js';
+    import { auth, db, onAuthStateChanged, signOut } from './src/firebase.js';
     import {
       collection, query, orderBy, limit, getDocs, doc, getDoc
     } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -212,15 +135,38 @@
     const hide = id => document.getElementById(id).classList.add('hidden');
     const show = id => document.getElementById(id).classList.remove('hidden');
 
-    const AVATAR_COLORS = [
-      '#bf4545','#4575bf','#45bf78','#bf9045','#8045bf','#45b8bf'
-    ];
+    // ── Theme ──────────────────────────────────
+    function getTheme() { return localStorage.getItem('cs-theme') || 'light'; }
+    function applyTheme(t) {
+      document.documentElement.className = t;
+      localStorage.setItem('cs-theme', t);
+      const lbl = document.getElementById('dd-theme-label');
+      if (lbl) lbl.textContent = t === 'dark' ? 'Tema claro' : 'Tema oscuro';
+    }
+    applyTheme(getTheme());
+    document.getElementById('dd-theme').onclick = () => {
+      applyTheme(document.documentElement.className === 'dark' ? 'light' : 'dark');
+      closeDropdown();
+    };
+    document.getElementById('dd-logout').onclick = () =>
+      signOut(auth).then(() => window.location.replace('feed.html'));
+
+    // ── Dropdown ───────────────────────────────
+    const avatarBtn = document.getElementById('nav-avatar');
+    const dropdown  = document.getElementById('nav-dropdown');
+    const openDropdown  = () => { dropdown.classList.add('open'); avatarBtn.classList.add('open'); };
+    const closeDropdown = () => { dropdown.classList.remove('open'); avatarBtn.classList.remove('open'); };
+    avatarBtn.onclick = e => { e.stopPropagation(); dropdown.classList.contains('open') ? closeDropdown() : openDropdown(); };
+    document.addEventListener('click',   e => { if (!dropdown.contains(e.target) && e.target !== avatarBtn) closeDropdown(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDropdown(); });
+
+    // ── Helpers ────────────────────────────────
+    const AVATAR_COLORS = ['#bf4545','#4575bf','#45bf78','#bf9045','#8045bf','#45b8bf'];
     function avatarColor(str) {
       let h = 0;
       for (const c of (str||'?')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
       return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
     }
-
     function formatDate(ts) {
       if (!ts) return '';
       const d = ts.toDate ? ts.toDate() : new Date(ts);
@@ -233,7 +179,7 @@
       return snp.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    function renderPosts(posts, currentUid) {
+    function renderPosts(posts) {
       const list = document.getElementById('posts-list');
       list.innerHTML = '';
       document.getElementById('post-count').textContent =
@@ -242,7 +188,7 @@
       if (!posts.length) {
         list.innerHTML = `
           <div class="empty">
-            <div class="empty-icon">✏️</div>
+            <img class="empty-icon" src="src/icons/pencil.svg" alt="">
             <div class="empty-title">SIN PUBLICACIONES AÚN</div>
             <p class="empty-sub">Sé el primero en publicar tu fuente pixel</p>
           </div>`;
@@ -252,27 +198,13 @@
       posts.forEach(post => {
         const card = document.createElement('div');
         card.className = 'post-card';
-
         const glyphCount = countGlyphs(post.font);
         const chars      = availableChars(post.font);
         const initial    = (post.autorNombre || post.autorEmail || '?')[0].toUpperCase();
         const bgCol      = avatarColor(post.uid);
-        const previewStr = post.previewText || 'HELLO';
 
-        const canvas = createTextCanvas(previewStr, post.font || {}, post.gridSize || 8, {
+        const canvas = createTextCanvas(post.previewText || 'HELLO', post.font || {}, post.gridSize || 8, {
           pixelSize: 4, color: '#bf4545', letterSpacing: 2, paddingX: 16, paddingY: 12
-        });
-
-        const glyphsHtml = chars.slice(0, 20).map(ch => {
-          const g = createGlyphGrid(post.font[ch], post.gridSize || 8, 2, '#bf4545');
-          const wrap = document.createElement('div');
-          wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px;';
-          const label = document.createElement('span');
-          label.textContent = ch;
-          label.style.cssText = 'font-size:8px;color:var(--muted);font-family:var(--mono);';
-          wrap.appendChild(g);
-          wrap.appendChild(label);
-          return wrap;
         });
 
         card.innerHTML = `
@@ -297,23 +229,25 @@
               <span class="font-stats">${glyphCount} GLIFOS</span>
             </div>
             <div class="card-glyphs-row" id="glyphs-${post.id}"></div>
-            <button class="btn-demo">VER DEMOSTRACIÓN COMPLETA →</button>
+            <button class="btn-demo">VER DEMOSTRACIÓN COMPLETA</button>
           </div>`;
 
         card.querySelector(`#preview-${post.id}`).appendChild(canvas);
         const glyphsRow = card.querySelector(`#glyphs-${post.id}`);
-        glyphsHtml.forEach(g => glyphsRow.appendChild(g));
+        chars.slice(0, 20).forEach(ch => {
+          const g = createGlyphGrid(post.font[ch], post.gridSize || 8, 2, '#bf4545');
+          const wrap  = document.createElement('div');
+          wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px;';
+          const label = document.createElement('span');
+          label.textContent = ch;
+          label.style.cssText = 'font-size:8px;color:var(--muted);font-family:var(--mono);';
+          wrap.appendChild(g); wrap.appendChild(label);
+          glyphsRow.appendChild(wrap);
+        });
 
-        card.querySelector('.btn-demo').onclick = (e) => {
-          e.stopPropagation();
-          sessionStorage.setItem('demoPost', JSON.stringify(post));
-          window.location.href = 'font-demo.html';
-        };
-        card.onclick = () => {
-          sessionStorage.setItem('demoPost', JSON.stringify(post));
-          window.location.href = 'font-demo.html';
-        };
-
+        const toDemo = () => { sessionStorage.setItem('demoPost', JSON.stringify(post)); window.location.href = 'font-demo.html'; };
+        card.querySelector('.btn-demo').onclick = e => { e.stopPropagation(); toDemo(); };
+        card.onclick = toDemo;
         list.appendChild(card);
       });
     }
@@ -323,23 +257,32 @@
       show('screen-app');
 
       if (user) {
-        const avatarEl     = document.getElementById('nav-avatar');
-        const navProyectos = document.getElementById('nav-proyectos');
         try {
           const perfil = await getDoc(doc(db, 'usuarios', user.uid, 'config', 'perfil'));
-          const nombre = perfil.exists() ? perfil.data().displayName : null;
-          avatarEl.textContent = (nombre || user.email || '?')[0].toUpperCase();
-        } catch { avatarEl.textContent = (user.email || '?')[0].toUpperCase(); }
-        navProyectos.style.display = '';
-        navProyectos.onclick = () => window.location.href = 'feed.html';
+          const d = perfil.exists() ? perfil.data() : {};
+          const nombre = d.displayName || user.email || '?';
+          const ini = nombre[0].toUpperCase();
+          document.getElementById('nav-avatar').textContent   = ini;
+          document.getElementById('dd-avatar-sm').textContent = ini;
+          document.getElementById('dd-user-name').textContent  = nombre;
+          document.getElementById('dd-user-email').textContent = user.email || '';
+          if (d.avatarColor) {
+            const av = document.getElementById('nav-avatar');
+            av.style.borderColor = d.avatarColor; av.style.color = d.avatarColor; av.style.background = d.avatarColor + '20';
+          }
+        } catch {
+          const ini = (user.email || '?')[0].toUpperCase();
+          document.getElementById('nav-avatar').textContent = ini;
+          document.getElementById('dd-user-email').textContent = user.email || '';
+        }
       } else {
-        const avatarEl = document.getElementById('nav-avatar');
-        avatarEl.href = 'index.html';
-        avatarEl.textContent = '?';
+        // Guest: hide logout, show login link
+        const logout = document.getElementById('dd-logout');
+        if (logout) logout.style.display = 'none';
       }
 
       const posts = await loadPosts();
-      renderPosts(posts, user?.uid);
+      renderPosts(posts);
     });
   </script>
 </body>

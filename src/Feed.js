@@ -1,6 +1,5 @@
 // ─────────────────────────────────────────────
 //  Feed.js  —  DOM vanilla puro
-//  Soporte vista grid / lista. Icono delete SVG.
 // ─────────────────────────────────────────────
 import { signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { auth }    from './firebase.js';
@@ -13,9 +12,9 @@ export function renderFeed(proyectos, onOpen, onDelete) {
   if (!proyectos || proyectos.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <span>✏️</span>
-        SIN PROYECTOS AÚN<br><br>
-        <span style="font-size:9px;opacity:0.7">Crea tu primera fuente pixel</span>
+        <img class="empty-icon" src="src/icons/fonts.svg" alt="">
+        <div class="empty-title">SIN PROYECTOS AÚN</div>
+        <p class="empty-sub">Crea tu primera fuente pixel con el botón de arriba</p>
       </div>`;
     return;
   }
@@ -39,7 +38,9 @@ export function renderFeed(proyectos, onOpen, onDelete) {
         <div class="card-preview p-preview"></div>
         <div class="card-actions">
           <button class="btn-open">ABRIR</button>
-          <button class="btn-del" title="Eliminar"><img src="src/icons/delete.svg" alt="Agregar"></button>
+          <button class="btn-del" title="Eliminar">
+            <img src="src/icons/delete.svg" alt="Eliminar" style="width:15px;height:15px;filter:var(--icon-filter);opacity:.45;">
+          </button>
         </div>
       </div>`;
 
@@ -63,7 +64,7 @@ function renderMiniPreview(container, proyecto) {
     grid.style.cssText = `display:grid;grid-template-columns:repeat(${size},3px);gap:0;`;
     for (let i = 0; i < size * size; i++) {
       const px = document.createElement('div');
-      px.style.cssText = `width:3px;height:3px;background:${glyph[i] ? 'var(--accent)' : 'rgba(200,185,230,0.05)'};`;
+      px.style.cssText = `width:3px;height:3px;background:${glyph[i] ? 'var(--accent)' : 'var(--pixel-empty)'};`;
       grid.appendChild(px);
     }
     container.appendChild(grid);
