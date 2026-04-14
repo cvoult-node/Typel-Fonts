@@ -315,8 +315,8 @@ export function EditorPage({
     /* ── MAIN LAYOUT ─────────────────────── */
     React.createElement('main', {
       style: {
-        padding: '20px', maxWidth: '1000px', margin: '0 auto', width: '100%',
-        display: 'grid', gridTemplateColumns: '1fr 280px', gap: '18px', alignItems: 'start'
+        padding: '20px', maxWidth: '800px', margin: '0 auto', width: '100%',
+        display: 'grid', gridTemplateColumns: '1fr 400px', gap: '18px', alignItems: 'start'
       }
     },
 
@@ -528,7 +528,7 @@ export function EditorPage({
         /* Char grid */
         React.createElement('div', {
           style: {
-            display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '4px',
+            display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: '4px',
             maxHeight: '58vh', overflowY: 'auto', paddingRight: '2px'
           }
         },
