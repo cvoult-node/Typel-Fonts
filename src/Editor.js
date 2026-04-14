@@ -315,7 +315,7 @@ export function EditorPage({
     /* ── MAIN LAYOUT ─────────────────────── */
     React.createElement('main', {
       style: {
-        padding: '20px', maxWidth: '1200px', margin: '0 auto', width: '100%',
+        padding: '20px', maxWidth: '1000px', margin: '0 auto', width: '100%',
         display: 'grid', gridTemplateColumns: '1fr 280px', gap: '18px', alignItems: 'start'
       }
     },
@@ -400,15 +400,6 @@ export function EditorPage({
               React.createElement('span', { style: { fontSize: '6px', letterSpacing: '1px' } }, t.label)
             )
           ),
-
-          // Hint
-          React.createElement('span', {
-            style: {
-              marginLeft: 'auto', fontFamily: FONT_MONO, fontSize: '8px',
-              color: 'var(--muted2)', letterSpacing: '1px', whiteSpace: 'nowrap'
-            }
-          }, 'IZQ: DIBUJAR · DER: BORRAR')
-        ),
 
         /* Pixel canvas */
         React.createElement('div', {
