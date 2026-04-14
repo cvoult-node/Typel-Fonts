@@ -134,7 +134,7 @@ export function EditorPage({
   ];
 
   const toolbarBase = {
-    padding: '8px 10px', borderRadius: R_BTN, cursor: 'pointer',
+    padding: '4px 5px', borderRadius: R_BTN, cursor: 'pointer',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', minWidth: '52px',
     fontFamily: FONT_MONO, border: 'none', transition: 'all .13s'
   };
@@ -371,7 +371,7 @@ export function EditorPage({
               }
             },
               React.createElement('img', {
-                src: `./src/icons/${t.iconName}.svg`, width: 15, height: 15,
+                src: `./src/icons/${t.iconName}.svg`, width: auto, height: auto,
                 style: { filter: tool === t.id ? 'invert(1)' : 'var(--icon-filter)', opacity: tool === t.id ? 1 : .65 }
               }),
               React.createElement('span', { style: { fontSize: '8px', letterSpacing: '1px' } }, t.label)
@@ -387,13 +387,13 @@ export function EditorPage({
               key: i, onClick: t.fn, title: t.label,
               style: {
                 ...toolbarBase,
-                background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--muted)'
+                background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)'
               },
               onMouseEnter: e => { e.currentTarget.style.background = 'var(--surface3)'; e.currentTarget.style.borderColor = 'var(--border2)'; },
               onMouseLeave: e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; }
             },
               React.createElement('img', {
-                src: `./src/icons/${t.iconName}.svg`, width: 15, height: 15,
+                src: `./src/icons/${t.iconName}.svg`, width: auto, height: auto,
                 style: { filter: 'var(--icon-filter)', opacity: .65 }
               }),
               React.createElement('span', { style: { fontSize: '8px', letterSpacing: '1px' } }, t.label)

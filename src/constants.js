@@ -15,7 +15,7 @@ export const TECLADO = [
   ' ',',','.',':',';','!','?'
 ];
 
-export const R_CARD = '14px';
+export const R_CARD = '12px';
 export const R_BTN  = '7px';
 
 export const FONT_MONO  = "'Space Mono', monospace";
