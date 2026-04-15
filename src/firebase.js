@@ -19,6 +19,8 @@ import {
   getDocs,
   query,
   orderBy,
+  where,
+  limit,
   deleteDoc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -53,5 +55,7 @@ export {
   getDocs,
   query,
   orderBy,
+  where,
+  limit,
   deleteDoc
 };
