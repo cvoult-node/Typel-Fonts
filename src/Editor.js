@@ -8,18 +8,37 @@ import { Btn, Icon, Overlay, Modal, Label } from './ui.js';
 import { buildAndDownload } from './canvas.js';
 
 // ── Pixel preview helper ──────────────────────
-const PixelPreview = ({ text, fontData, gridSize, pixelSize = 3, color = ACCENT, showSpaceMarker = false, letterSpacing = 0, wordSpacing = 10 }) => {
+const PixelPreview = ({
+  text,
+  fontData,
+  gridSize,
+  pixelSize = 3,
+  color = ACCENT,
+  showSpaceMarker = false,
+  letterSpacing = 0,
+  wordSpacing = 10
+}) => {
   const chars = text.split('');
   const sz = Math.min(gridSize, 32);
+
   return React.createElement('div', {
-    style: { display: 'flex', gap: '0px', flexWrap: 'wrap', padding: '8px', minHeight: '28px', alignItems: 'center' }
+    style: {
+      display: 'flex',
+      gap: '0px',
+      flexWrap: 'wrap',
+      padding: '8px',
+      minHeight: '28px',
+      alignItems: 'center'
+    }
   },
     chars.map((ch, ci) => {
       const glyph = fontData[ch];
       const isSpace = ch === ' ';
+
       const spacingPx = (isSpace ? wordSpacing : letterSpacing) * 0.22;
       const minSpaceWidth = Math.max(pixelSize * 2, 1);
       const computedSpaceWidth = Math.max(minSpaceWidth, pixelSize * 3 + wordSpacing * 0.2);
+
       return React.createElement('div', {
         key: ci,
         style: {
@@ -38,16 +57,23 @@ const PixelPreview = ({ text, fontData, gridSize, pixelSize = 3, color = ACCENT,
           React.createElement('div', {
             key: pi,
             style: {
-              width: `${pixelSize}px`, height: `${pixelSize}px`,
+              width: `${pixelSize}px`,
+              height: `${pixelSize}px`,
               background: glyph?.[pi] ? color : 'transparent'
             }
           })
         ),
         (isSpace && showSpaceMarker) && React.createElement('div', {
           style: {
-            position: 'absolute', top: '2px', bottom: '2px', left: '50%',
-            width: '1px', transform: 'translateX(-50%)',
-            background: 'var(--border-accent)', opacity: .65, pointerEvents: 'none'
+            position: 'absolute',
+            top: '2px',
+            bottom: '2px',
+            left: '50%',
+            width: '1px',
+            transform: 'translateX(-50%)',
+            background: 'var(--border-accent)',
+            opacity: .65,
+            pointerEvents: 'none'
           }
         })
       );
@@ -113,11 +139,15 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: externalPre
           style: { fontFamily: FONT_MONO, fontSize: '8px', color: 'var(--muted)', letterSpacing: '2px', marginBottom: '10px' }
         }, 'PREVIEW'),
         React.createElement(PixelPreview, {
-          text: PREVIEW_TEXT, fontData, gridSize, pixelSize: 4, color: ACCENT, showSpaceMarker,
-          letterSpacing, wordSpacing
-        })
-      ),
-
+          text: PREVIEW_TEXT,
+          fontData,
+          gridSize,
+          pixelSize: 4,
+          color: ACCENT,
+          showSpaceMarker,
+          letterSpacing,
+          wordSpacing   
+})
       // Nombre archivo
       fieldGroup('NOMBRE DEL ARCHIVO',
         React.createElement('input', {
@@ -622,6 +652,22 @@ export function EditorPage({
         isSaving && React.createElement('span', {
           style: { fontFamily: FONT_MONO, fontSize: '9px', color: 'var(--muted2)', letterSpacing: '2px' }
         }, 'GUARDANDO...'),
+
+        React.createElement('button', {
+          onClick: () => setShowSpaceMarker(v => !v),
+          title: showSpaceMarker ? 'Ocultar marcador de espacio' : 'Mostrar marcador de espacio',
+          style: {
+            height: '32px', padding: '0 10px', borderRadius: R_BTN,
+            background: showSpaceMarker ? ACCENT : 'var(--surface2)',
+            border: showSpaceMarker ? 'none' : '1px solid var(--border)',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+            fontFamily: FONT_MONO, fontSize: '8px', letterSpacing: '1px',
+            color: showSpaceMarker ? '#fff' : 'var(--muted)', transition: 'all .15s'
+          }
+        },
+          React.createElement('span', { style: { fontSize: '11px', lineHeight: 1 } }, '␠'),
+          'ESPACIO'
+        ),
 
         React.createElement('button', {
           onClick: toggleTheme, title: isDark ? 'Tema claro' : 'Tema oscuro',
