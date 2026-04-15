@@ -129,25 +129,36 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: externalPre
       }, 'EXPORTAR FUENTE'),
 
       // Preview
-      React.createElement('div', {
-        style: {
-          background: 'var(--canvas-bg)', border: '1px solid var(--border)',
-          borderRadius: R_BTN, padding: '16px', minHeight: '72px'
-        }
-      },
-        React.createElement('div', {
-          style: { fontFamily: FONT_MONO, fontSize: '8px', color: 'var(--muted)', letterSpacing: '2px', marginBottom: '10px' }
-        }, 'PREVIEW'),
-        React.createElement(PixelPreview, {
-          text: PREVIEW_TEXT,
-          fontData,
-          gridSize,
-          pixelSize: 4,
-          color: ACCENT,
-          showSpaceMarker,
-          letterSpacing,
-          wordSpacing   
-}),
+React.createElement('div', {
+  style: {
+    background: 'var(--canvas-bg)',
+    border: '1px solid var(--border)',
+    borderRadius: R_BTN,
+    padding: '16px',
+    minHeight: '72px'
+  }
+},
+  React.createElement('div', {
+    style: {
+      fontFamily: FONT_MONO,
+      fontSize: '8px',
+      color: 'var(--muted)',
+      letterSpacing: '2px',
+      marginBottom: '10px'
+    }
+  }, 'PREVIEW'),
+
+  React.createElement(PixelPreview, {
+    text: PREVIEW_TEXT,
+    fontData,
+    gridSize,
+    pixelSize: 4,
+    color: ACCENT,
+    showSpaceMarker,
+    letterSpacing,
+    wordSpacing
+  })
+),
       // Nombre archivo
       fieldGroup('NOMBRE DEL ARCHIVO',
         React.createElement('input', {
