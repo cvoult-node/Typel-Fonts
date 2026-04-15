@@ -147,7 +147,7 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: externalPre
           showSpaceMarker,
           letterSpacing,
           wordSpacing   
-})
+}),
       // Nombre archivo
       fieldGroup('NOMBRE DEL ARCHIVO',
         React.createElement('input', {
