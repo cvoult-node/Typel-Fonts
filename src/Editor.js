@@ -1032,11 +1032,15 @@ export function EditorPage({
     showExport && React.createElement(ExportModal, {
       projectName, fontData, gridSize,
       previewText,
-      showSpaceMarker,
       onClose: () => setShowExport(false),
       onExport: (filename, format, meta) => {
-        buildAndDownload(fontData, gridSize, filename, format, meta);
-        setShowExport(false);
+        try {
+          const safeFilename = (filename || projectName || 'mi-fuente').trim() || 'mi-fuente';
+          buildAndDownload(fontData, gridSize, safeFilename, format, meta);
+          setShowExport(false);
+        } catch (err) {
+          alert(err?.message || 'No se pudo exportar la fuente.');
+        }
       }
     }),
 
