@@ -24,7 +24,6 @@ main
     chars.map((ch, ci) => {
       const glyph = fontData[ch];
       const isSpace = ch === ' ';
-codex/improve-editor.html-to-handle-8x8-spaces-psgjmi
       const spacingPx = (isSpace ? wordSpacing : letterSpacing) * 0.22;
       const minSpaceWidth = Math.max(pixelSize * 2, 1);
       const computedSpaceWidth = Math.max(minSpaceWidth, pixelSize * 3 + wordSpacing * 0.2);
@@ -36,7 +35,6 @@ codex/improve-editor.html-to-handle-8x8-spaces-psgjmi
           display: 'grid',
           gridTemplateColumns: `repeat(${sz},${pixelSize}px)`,
           position: 'relative',
-codex/improve-editor.html-to-handle-8x8-spaces-psgjmi
           width: isSpace ? `${computedSpaceWidth}px` : undefined,
           minWidth: isSpace ? `${minSpaceWidth}px` : undefined,
           marginRight: `${spacingPx}px`,
