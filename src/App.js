@@ -220,6 +220,33 @@ function App() {
     });
   };
 
+  // -- Init: verificar auth y cargar proyecto desde sessionStorage
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      if (!u) { window.location.replace('feed.html'); return; }
+      const raw = sessionStorage.getItem('proyectoActivo');
+      if (!raw) { window.location.replace('feed.html'); return; }
+      try {
+        const p = JSON.parse(raw);
+        if (!p || !p.id) throw new Error('Proyecto sin id');
+        setUser(u);
+        setProyectoActivo(p.id);
+        setProyectoNombre(p.nombre || 'mi-fuente');
+        setGridSize(p.gridSize || 8);
+        setFontData(p.font || {});
+        setGrid((p.font?.['A']) ? p.font['A'] : Array((p.gridSize || 8) * (p.gridSize || 8)).fill(false));
+        setCurrentChar('A');
+        setStatus('ready');
+      } catch (e) {
+        setErrorMsg('Proyecto invalido. Volviendo...');
+        setStatus('error');
+        setTimeout(() => window.location.replace('feed.html'), 2000);
+      }
+    });
+    return unsub;
+  }, []);
+
+  // -- Atajos de teclado
   useEffect(() => {
     const handler = (e) => {
       if (e.ctrlKey || e.metaKey) {
