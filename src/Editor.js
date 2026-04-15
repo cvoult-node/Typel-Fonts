@@ -8,27 +8,37 @@ import { Btn, Icon, Overlay, Modal, Label } from './ui.js';
 import { buildAndDownload } from './canvas.js';
 
 // ── Pixel preview helper ──────────────────────
- codex/improve-editor.html-to-handle-8x8-spaces-psgjmi
 const PixelPreview = ({
-  text, fontData, gridSize, pixelSize = 3, color = ACCENT, showSpaceMarker = false,
-  letterSpacing = 0, wordSpacing = 10
+  text,
+  fontData,
+  gridSize,
+  pixelSize = 3,
+  color = ACCENT,
+  showSpaceMarker = false,
+  letterSpacing = 0,
+  wordSpacing = 10
 }) => {
-
-const PixelPreview = ({ text, fontData, gridSize, pixelSize = 3, color = ACCENT, showSpaceMarker = false }) => {
-main
   const chars = text.split('');
   const sz = Math.min(gridSize, 32);
+
   return React.createElement('div', {
-    style: { display: 'flex', gap: '0px', flexWrap: 'wrap', padding: '8px', minHeight: '28px', alignItems: 'center' }
+    style: {
+      display: 'flex',
+      gap: '0px',
+      flexWrap: 'wrap',
+      padding: '8px',
+      minHeight: '28px',
+      alignItems: 'center'
+    }
   },
     chars.map((ch, ci) => {
       const glyph = fontData[ch];
       const isSpace = ch === ' ';
+
       const spacingPx = (isSpace ? wordSpacing : letterSpacing) * 0.22;
       const minSpaceWidth = Math.max(pixelSize * 2, 1);
       const computedSpaceWidth = Math.max(minSpaceWidth, pixelSize * 3 + wordSpacing * 0.2);
 
- main
       return React.createElement('div', {
         key: ci,
         style: {
@@ -38,8 +48,6 @@ main
           width: isSpace ? `${computedSpaceWidth}px` : undefined,
           minWidth: isSpace ? `${minSpaceWidth}px` : undefined,
           marginRight: `${spacingPx}px`,
-
-main
           border: (isSpace && showSpaceMarker) ? '1px dashed var(--border)' : 'none',
           borderRadius: '4px',
           padding: (isSpace && showSpaceMarker) ? '2px' : 0
@@ -49,16 +57,23 @@ main
           React.createElement('div', {
             key: pi,
             style: {
-              width: `${pixelSize}px`, height: `${pixelSize}px`,
+              width: `${pixelSize}px`,
+              height: `${pixelSize}px`,
               background: glyph?.[pi] ? color : 'transparent'
             }
           })
         ),
         (isSpace && showSpaceMarker) && React.createElement('div', {
           style: {
-            position: 'absolute', top: '2px', bottom: '2px', left: '50%',
-            width: '1px', transform: 'translateX(-50%)',
-            background: 'var(--border-accent)', opacity: .65, pointerEvents: 'none'
+            position: 'absolute',
+            top: '2px',
+            bottom: '2px',
+            left: '50%',
+            width: '1px',
+            transform: 'translateX(-50%)',
+            background: 'var(--border-accent)',
+            opacity: .65,
+            pointerEvents: 'none'
           }
         })
       );
@@ -124,15 +139,15 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: externalPre
           style: { fontFamily: FONT_MONO, fontSize: '8px', color: 'var(--muted)', letterSpacing: '2px', marginBottom: '10px' }
         }, 'PREVIEW'),
         React.createElement(PixelPreview, {
-codex/improve-editor.html-to-handle-8x8-spaces-psgjmi
-          text: PREVIEW_TEXT, fontData, gridSize, pixelSize: 4, color: ACCENT, showSpaceMarker,
-          letterSpacing, wordSpacing
-
-          text: PREVIEW_TEXT, fontData, gridSize, pixelSize: 4, color: ACCENT, showSpaceMarker
-main
-        })
-      ),
-
+          text: PREVIEW_TEXT,
+          fontData,
+          gridSize,
+          pixelSize: 4,
+          color: ACCENT,
+          showSpaceMarker,
+          letterSpacing,
+          wordSpacing   
+})
       // Nombre archivo
       fieldGroup('NOMBRE DEL ARCHIVO',
         React.createElement('input', {
