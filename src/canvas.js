@@ -38,7 +38,7 @@ export function shiftGrid(grid, size, dir) {
 
 /**
  * Exportar font data → opentype.Font y descargar
- * @param {Object} meta - { fontName, author, letterSpacing, wordSpacing, unitsPerEm, ascender, descender }
+ * @param {Object} meta - { fontName, author, letterSpacing, wordSpacing, extraSpace, unitsPerEm, ascender, descender }
  */
 export function buildAndDownload(fontData, gridSize, filename, format, meta = {}) {
   const ot = window.__opentype__;
@@ -56,13 +56,15 @@ export function buildAndDownload(fontData, gridSize, filename, format, meta = {}
     author        = '',
     letterSpacing = 0,
     wordSpacing   = 10,
+    extraSpace    = 1, // Nuevo: margen extra por glifo
     unitsPerEm    = 1000,
     ascender      = 800,
     descender     = -200,
   } = meta;
 
   const S = 100;
-  const pxSpacing = Math.round(letterSpacing * 10);
+  // El interletraje final es la suma del letterSpacing y el extraSpace (escalado)
+  const pxSpacing = Math.round((letterSpacing + extraSpace) * 10);
 
   const getGlyphBounds = (glyph = []) => {
     let minCol = gridSize, maxCol = -1;
@@ -83,19 +85,29 @@ export function buildAndDownload(fontData, gridSize, filename, format, meta = {}
   Object.keys(fontData).forEach(char => {
     const glyphGrid = fontData[char] || [];
     const bounds = getGlyphBounds(glyphGrid);
+    
+    // Si el glifo está vacío y no es el espacio, lo saltamos (Pedido por el usuario)
+    if (!bounds && char !== ' ') return;
+
     const path = new ot.Path();
-    glyphGrid.forEach((on, i) => {
-      if (!on) return;
-      const col = i % gridSize;
-      const x = ((bounds ? (col - bounds.minCol) : col)) * S;
-      const y = (gridSize - 1 - Math.floor(i / gridSize)) * S;
-      path.moveTo(x, y); path.lineTo(x+S, y);
-      path.lineTo(x+S, y+S); path.lineTo(x, y+S);
-      path.close();
-    });
+    if (bounds) {
+      glyphGrid.forEach((on, i) => {
+        if (!on) return;
+        const col = i % gridSize;
+        // Ajustamos X para que empiece en 0 (quitando espacios vacíos a la izquierda)
+        const x = (col - bounds.minCol) * S;
+        const y = (gridSize - 1 - Math.floor(i / gridSize)) * S;
+        path.moveTo(x, y); path.lineTo(x+S, y);
+        path.lineTo(x+S, y+S); path.lineTo(x, y+S);
+        path.close();
+      });
+    }
 
     const glyphWidth = bounds ? (bounds.widthCols * S) : 0;
     const minAdvance = S;
+    
+    // El avance del espacio usa wordSpacing
+    // El avance de otros caracteres usa su ancho real + espaciado configurado
     const advance = char === ' '
       ? Math.max(minAdvance, Math.round(wordSpacing * 10))
       : Math.max(minAdvance, glyphWidth + pxSpacing);

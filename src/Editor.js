@@ -16,7 +16,8 @@ const PixelPreview = ({
   color = ACCENT,
   showSpaceMarker = false,
   letterSpacing = 0,
-  wordSpacing = 10
+  wordSpacing = 10,
+  extraSpace = 1 // Nuevo: espacio extra por pixel
 }) => {
   const chars = text.split('');
   const sz = Math.min(gridSize, 32);
@@ -35,7 +36,8 @@ const PixelPreview = ({
       const glyph = fontData[ch];
       const isSpace = ch === ' ';
 
-      const spacingPx = (isSpace ? wordSpacing : letterSpacing) * 0.22;
+      // Aplicamos el extraSpace al interletraje visual
+      const spacingPx = (isSpace ? wordSpacing : (letterSpacing + extraSpace)) * 0.22;
       const minSpaceWidth = Math.max(pixelSize * 2, 1);
       const computedSpaceWidth = Math.max(minSpaceWidth, pixelSize * 3 + wordSpacing * 0.2);
 
@@ -89,6 +91,7 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: externalPre
   const [format,        setFormat]        = useState('otf');
   const [letterSpacing, setLetterSpacing] = useState(0);
   const [wordSpacing,   setWordSpacing]   = useState(10);
+  const [extraSpace,    setExtraSpace]    = useState(1); // Por defecto 1px como pidió el usuario
   const [showAdvanced,  setShowAdvanced]  = useState(false);
   const [unitsPerEm,    setUnitsPerEm]    = useState(1000);
   const [ascender,      setAscender]      = useState(800);
@@ -118,7 +121,7 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: externalPre
       style: {
         background: 'var(--surface)', border: '1px solid var(--border2)',
         borderRadius: R_CARD, padding: '24px', width: '520px', minWidth: '520px', maxWidth: '520px',
-        height: '760px', minHeight: '760px', maxHeight: '760px', overflowY: 'auto',
+        height: '780px', minHeight: '780px', maxHeight: '780px', overflowY: 'auto',
         boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
         display: 'flex', flexDirection: 'column', gap: '20px'
       }
@@ -129,36 +132,37 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: externalPre
       }, 'EXPORTAR FUENTE'),
 
       // Preview
-React.createElement('div', {
-  style: {
-    background: 'var(--surface2)',
-    border: '1px solid var(--border2)',
-    borderRadius: R_BTN,
-    padding: '14px',
-    minHeight: '96px'
-  }
-},
-  React.createElement('div', {
-    style: {
-      fontFamily: FONT_MONO,
-      fontSize: '9px',
-      color: 'var(--muted2)',
-      letterSpacing: '2px',
-      marginBottom: '10px'
-    }
-  }, 'PREVIEW'),
+      React.createElement('div', {
+        style: {
+          background: 'var(--surface2)',
+          border: '1px solid var(--border2)',
+          borderRadius: R_BTN,
+          padding: '14px',
+          minHeight: '96px'
+        }
+      },
+        React.createElement('div', {
+          style: {
+            fontFamily: FONT_MONO,
+            fontSize: '9px',
+            color: 'var(--muted2)',
+            letterSpacing: '2px',
+            marginBottom: '10px'
+          }
+        }, 'PREVIEW'),
 
-  React.createElement(PixelPreview, {
-    text: PREVIEW_TEXT,
-    fontData,
-    gridSize,
-    pixelSize: 4,
-    color: ACCENT,
-    showSpaceMarker: false,
-    letterSpacing,
-    wordSpacing
-  })
-),
+        React.createElement(PixelPreview, {
+          text: PREVIEW_TEXT,
+          fontData,
+          gridSize,
+          pixelSize: 4,
+          color: ACCENT,
+          showSpaceMarker: false,
+          letterSpacing,
+          wordSpacing,
+          extraSpace
+        })
+      ),
       // Nombre archivo
       fieldGroup('NOMBRE DEL ARCHIVO',
         React.createElement('input', {
@@ -190,11 +194,26 @@ React.createElement('div', {
         })
       ),
 
-      // Interletraje
-      fieldGroup('INTERLETRAJE (letter spacing)',
+      // Espacio extra (Pedido por el usuario)
+      fieldGroup('ESPACIO EXTRA POR PÍXEL (-10 a 10px)',
         React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px' } },
           React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, 'Ajuste de separación entre letras'),
+            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, 'Añade un margen fijo a cada glifo'),
+            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '12px', color: ACCENT, minWidth: '32px', textAlign: 'right' } }, extraSpace + 'px')
+          ),
+          React.createElement('input', {
+            type: 'range', min: -10, max: 10, value: extraSpace,
+            onChange: e => setExtraSpace(Number(e.target.value)),
+            style: sliderStyle
+          })
+        )
+      ),
+
+      // Interletraje
+      fieldGroup('INTERLETRAJE ADICIONAL (letter spacing)',
+        React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '6px' } },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, 'Ajuste fino de separación'),
             React.createElement('span', { style: { fontFamily: FONT_MONO, fontSize: '12px', color: ACCENT, minWidth: '32px', textAlign: 'right' } }, letterSpacing)
           ),
           React.createElement('input', {
@@ -297,7 +316,7 @@ React.createElement('div', {
         }, 'CANCELAR'),
         React.createElement('button', {
           onClick: () => onExport(filename, format, {
-            fontName, author, letterSpacing, wordSpacing,
+            fontName, author, letterSpacing, wordSpacing, extraSpace,
             unitsPerEm, ascender, descender
           }),
           style: {
@@ -482,7 +501,8 @@ const GuideOverlay = ({ gridSize }) => {
 
   const yCap = ((Math.max(1, Math.floor(gridSize * 0.2)) / gridSize) * 100).toFixed(4);
   const yXHeight = ((Math.max(1, Math.floor(gridSize * 0.5)) / gridSize) * 100).toFixed(4);
-  const yBaseline = (((gridSize - 1) / gridSize) * 100).toFixed(4);
+  // Modificado: un píxel más arriba como pidió el usuario (gridSize - 2 en lugar de gridSize - 1)
+  const yBaseline = (((gridSize - 2) / gridSize) * 100).toFixed(4);
   const mid = ((gridSize / 2) / gridSize * 100).toFixed(4);
 
   const namedGuide = (key, y, label, stroke, width = '1.4') => ([
