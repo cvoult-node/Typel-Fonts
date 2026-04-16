@@ -145,6 +145,7 @@
   </div>
 
     <script src="src/env.js"></script>
+    <script type="module">
     import { auth, db, onAuthStateChanged, signOut, deleteDoc, doc, getDoc } from './src/firebase.js';
     import { collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { createTextCanvas, createGlyphGrid, countGlyphs, availableChars } from './src/pixelRenderer.js';
@@ -298,7 +299,7 @@
           };
           card.querySelector('.btn-delete').onclick = async e => {
             e.stopPropagation();
-            if (confirm('¿Estás seguro de que quieres eliminar esta publicación? El proyecto original no se borrará.')) {
+            const doDelete = async () => {
               try {
                 await deletePost(post.id);
                 card.remove();
@@ -309,6 +310,11 @@
                 console.error(err);
                 alert('Error al eliminar la publicación.');
               }
+            };
+            if (window.csConfirm) {
+              window.csConfirm('¿Eliminar esta publicación? El proyecto original no se borrará.', doDelete);
+            } else if (confirm('¿Eliminar esta publicación? El proyecto original no se borrará.')) {
+              doDelete();
             }
           };
         }
