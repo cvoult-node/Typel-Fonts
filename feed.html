@@ -239,6 +239,9 @@
                 <img class="dd-icon" src="src/icons/theme.svg" id="dd-theme-icon" alt="">
                 <span id="dd-theme-label">Tema oscuro</span>
               </button>
+              <button class="dd-item" id="dd-logout" style="color:var(--accent);">
+                <img class="dd-icon" src="src/icons/logout.svg" alt="">Cerrar sesión
+              </button>
             </div>
           </div>
         </div>
@@ -321,8 +324,10 @@
     // ── Navbar ─────────────────────────────────────────────────────────────
     initNavbar({ auth, db, onAuthStateChanged, doc, getDoc });
 
-    document.getElementById('dd-logout').onclick = () => signOut(auth).then(() => window.location.replace('index.html'));
-    document.getElementById('dd-new-font').onclick = () => {
+    const ddLogout = document.getElementById('dd-logout');
+    if (ddLogout) ddLogout.onclick = () => signOut(auth).then(() => window.location.replace('index.html'));
+    const ddNewFont = document.getElementById('dd-new-font');
+    if (ddNewFont) ddNewFont.onclick = () => {
       document.getElementById('modal-overlay').classList.remove('hidden');
       document.getElementById('new-font-name').value = ''; document.getElementById('new-font-name').focus();
     };
