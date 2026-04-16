@@ -9,6 +9,7 @@ import {
   createUserWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+// Añadimos collection, getDocs, query, orderBy y deleteDoc que faltaban
 import { 
   getFirestore, 
   doc, 
@@ -20,8 +21,7 @@ import {
   orderBy,
   where,
   limit,
-  deleteDoc,
-  serverTimestamp
+  deleteDoc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ⚠️  Las credenciales se cargan desde src/env.js (no incluido en Git).
@@ -57,6 +57,5 @@ export {
   orderBy,
   where,
   limit,
-  deleteDoc,
-  serverTimestamp
+  deleteDoc
 };

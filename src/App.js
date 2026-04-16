@@ -223,7 +223,7 @@ function App() {
   // -- Init: verificar auth y cargar proyecto desde sessionStorage
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
-      if (!u) { window.location.replace('index.html'); return; }
+      if (!u) { window.location.replace('feed.html'); return; }
       const raw = sessionStorage.getItem('proyectoActivo');
       if (!raw) { window.location.replace('feed.html'); return; }
       try {

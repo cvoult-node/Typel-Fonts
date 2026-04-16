@@ -120,7 +120,6 @@
     .theme-toggle img { width: 16px; height: 16px; }
     .dark .theme-toggle img { filter: invert(1) brightness(0.85); }
   </style>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body>
   <button class="theme-toggle" id="btn-theme" title="Cambiar tema">
@@ -201,6 +200,5 @@
     document.getElementById('btn-google').onclick = () =>
       signInWithPopup(auth, provider).catch(err => showError(err.message));
   </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>

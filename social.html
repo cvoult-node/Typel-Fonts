@@ -27,7 +27,6 @@
       border-radius: var(--r-card); overflow: hidden; margin-bottom: 16px;
       transition: border-color .18s, transform .15s, box-shadow .18s;
       cursor: pointer; box-shadow: var(--shadow-card);
-      position: relative;
     }
     .post-card:hover { border-color: var(--border-accent); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
     .card-accent-line { height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
@@ -56,27 +55,14 @@
     .font-name { font-family: var(--pixel); font-size: 10px; color: var(--text); letter-spacing: 1px; }
     .font-stats { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
     .card-glyphs-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-    
-    .card-footer { display: flex; gap: 8px; margin-top: 16px; }
     .btn-demo {
-      flex: 1; padding: 10px;
+      display: block; width: 100%; margin-top: 16px; padding: 10px;
       background: none; border: 1px solid var(--border); border-radius: var(--r-btn);
       color: var(--muted); font-family: var(--mono); font-size: 9px;
       letter-spacing: 2px; cursor: pointer;
       transition: border-color .15s, color .15s, background .15s; text-align: center;
     }
     .btn-demo:hover { border-color: var(--accent); color: var(--accent); background: var(--accent3); }
-
-    .btn-owner {
-      padding: 10px; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: var(--r-btn); color: var(--muted); font-family: var(--mono);
-      font-size: 9px; letter-spacing: 1px; cursor: pointer; transition: all .15s;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .btn-owner:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-owner.danger:hover { border-color: #e62222; color: #e62222; background: rgba(230,34,34,0.05); }
-    .btn-owner img { width: 12px; height: 12px; filter: var(--icon-filter); opacity: .6; }
-    .btn-owner:hover img { opacity: 1; filter: none; }
 
     /* ── Empty state ── */
     .empty { text-align: center; padding: 80px 20px; color: var(--muted); }
@@ -145,15 +131,15 @@
   </div>
 
     <script src="src/env.js"></script>
-    import { auth, db, onAuthStateChanged, signOut, deleteDoc, doc, getDoc } from './src/firebase.js';
-    import { collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  <script type="module">
+    import { auth, db, onAuthStateChanged, signOut } from './src/firebase.js';
+    import {
+      collection, query, orderBy, limit, getDocs, doc, getDoc
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { createTextCanvas, createGlyphGrid, countGlyphs, availableChars } from './src/pixelRenderer.js';
-    import { deletePost } from './src/publish.js';
 
     const hide = id => document.getElementById(id).classList.add('hidden');
     const show = id => document.getElementById(id).classList.remove('hidden');
-
-    let currentUser = null;
 
     // ── Theme ──────────────────────────────────
     function getTheme() { return localStorage.getItem('cs-theme') || 'light'; }
@@ -222,7 +208,6 @@
         const chars      = availableChars(post.font);
         const initial    = (post.autorNombre || post.autorEmail || '?')[0].toUpperCase();
         const bgCol      = avatarColor(post.uid);
-        const isOwner    = currentUser && currentUser.uid === post.uid;
 
         const canvas = createTextCanvas(post.previewText || 'HELLO', post.font || {}, post.gridSize || 8, {
           pixelSize: 4, color: '#bf4545', letterSpacing: 2, paddingX: 16, paddingY: 12
@@ -250,17 +235,7 @@
               <span class="font-stats">${glyphCount} GLIFOS</span>
             </div>
             <div class="card-glyphs-row" id="glyphs-${post.id}"></div>
-            <div class="card-footer">
-              <button class="btn-demo">VER DEMOSTRACIÓN</button>
-              ${isOwner ? `
-                <button class="btn-owner btn-edit" title="Editar proyecto">
-                  <img src="src/icons/edit.svg" alt=""> EDITAR
-                </button>
-                <button class="btn-owner danger btn-delete" title="Eliminar publicación">
-                  <img src="src/icons/delete.svg" alt=""> BORRAR
-                </button>
-              ` : ''}
-            </div>
+            <button class="btn-demo">VER DEMOSTRACIÓN COMPLETA</button>
           </div>`;
 
         card.querySelector(`#preview-${post.id}`).appendChild(canvas);
@@ -278,41 +253,6 @@
 
         const toDemo = () => { sessionStorage.setItem('demoPost', JSON.stringify(post)); window.location.href = 'font-demo.html'; };
         card.querySelector('.btn-demo').onclick = e => { e.stopPropagation(); toDemo(); };
-        
-        if (isOwner) {
-          card.querySelector('.btn-edit').onclick = async e => {
-            e.stopPropagation();
-            // Cargar el proyecto completo desde la colección del usuario
-            try {
-              const projSnap = await getDoc(doc(db, 'usuarios', currentUser.uid, 'proyectos', post.proyectoId));
-              if (projSnap.exists()) {
-                sessionStorage.setItem('proyectoActivo', JSON.stringify({ id: post.proyectoId, ...projSnap.data() }));
-                window.location.href = 'editor.html';
-              } else {
-                alert('No se encontró el proyecto original.');
-              }
-            } catch (err) {
-              console.error(err);
-              alert('Error al cargar el proyecto.');
-            }
-          };
-          card.querySelector('.btn-delete').onclick = async e => {
-            e.stopPropagation();
-            if (confirm('¿Estás seguro de que quieres eliminar esta publicación? El proyecto original no se borrará.')) {
-              try {
-                await deletePost(post.id);
-                card.remove();
-                const countEl = document.getElementById('post-count');
-                const currentCount = parseInt(countEl.textContent);
-                countEl.textContent = `${currentCount - 1} FUENTE${(currentCount - 1) !== 1 ? 'S' : ''}`;
-              } catch (err) {
-                console.error(err);
-                alert('Error al eliminar la publicación.');
-              }
-            }
-          };
-        }
-
         card.onclick = toDemo;
         list.appendChild(card);
       });
@@ -321,7 +261,6 @@
     onAuthStateChanged(auth, async (user) => {
       hide('screen-loading');
       show('screen-app');
-      currentUser = user;
 
       if (user) {
         try {
