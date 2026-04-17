@@ -202,19 +202,7 @@ export function initFeedEvents(onCreateProject) {
 
   if (!modal || !btnNew || !btnClose || !btnConf || !inputName) return;
 
-  let selectedSize = 8;
-
-  const sizeButtons = document.querySelectorAll('.grid-size-btn');
-  sizeButtons.forEach(btn => {
-    btn.onclick = () => {
-      sizeButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedSize = parseInt(btn.dataset.size, 10);
-    };
-  });
-
-  const defaultBtn = document.querySelector('.grid-size-btn[data-size="8"]');
-  if (defaultBtn) defaultBtn.classList.add('active');
+  const FIXED_SIZE = 14;
 
   btnConf._onCreate = onCreateProject;
 
@@ -222,9 +210,6 @@ export function initFeedEvents(onCreateProject) {
     modal.classList.remove('hidden');
     inputName.value = '';
     inputName.focus();
-    selectedSize = 8;
-    sizeButtons.forEach(b => b.classList.remove('active'));
-    if (defaultBtn) defaultBtn.classList.add('active');
   };
   btnClose.onclick  = () => modal.classList.add('hidden');
   modal.onclick     = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
@@ -247,7 +232,7 @@ export function initFeedEvents(onCreateProject) {
       return;
     }
     btnConf.disabled = true; btnConf.textContent = '...';
-    try { await btnConf._onCreate(nombre, selectedSize); }
+    try { await btnConf._onCreate(nombre, FIXED_SIZE); }
     catch (err) { console.error(err); alert('No se pudo crear el proyecto.'); }
     finally { btnConf.disabled = false; btnConf.textContent = 'CREAR'; modal.classList.add('hidden'); }
   };

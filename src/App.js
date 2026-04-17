@@ -14,8 +14,8 @@ import { Overlay, Modal, Btn } from './ui.js';
 
 window.__opentype__ = opentype;
 
-// Grid por defecto: 12×12 (permite descenders en "g","p","q","y")
-const DEFAULT_GRID = 12;
+// Grid por defecto: 14×14
+const DEFAULT_GRID = 14;
 
 // ── ConfirmDialog — reemplaza confirm() nativo ─────────────────
 function ConfirmDialog({ message, onConfirm, onCancel }) {

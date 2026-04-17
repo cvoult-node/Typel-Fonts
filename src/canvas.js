@@ -71,9 +71,10 @@ export function buildAndDownload(fontData, gridSize, filename, format, meta = {}
     descender     = -250,
   } = meta;
 
-  // Escala: cada píxel → S unidades opentype
+  // Escala: cada píxel del canvas → S unidades opentype
+  // letterSpacing ya está en px del canvas, se convierte directamente
   const S = 100;
-  const pxSpacing = Math.round((letterSpacing + extraSpace) * 10);
+  const pxSpacing = Math.round(letterSpacing * S);
 
   // Fila de baseline (0-indexed desde arriba del grid)
   // Para 12×12: fila 8, dejando filas 9-11 para descenders
