@@ -417,10 +417,7 @@ const PreferencesModal = ({
   showSpaceMarker, setShowSpaceMarker,
   showCenterGuide, setShowCenterGuide,
   centerGuideCol, setCenterGuideCol,
-  capGuideRow, setCapGuideRow,
   xHeightGuideRow, setXHeightGuideRow,
-  baselineGuideRow, setBaselineGuideRow,
-  descGuideRow, setDescGuideRow,
   gridSize
 }) => {
   const [menu, setMenu] = useState('guides');
@@ -493,39 +490,9 @@ const PreferencesModal = ({
         position: 'absolute',
         left: 0,
         right: 0,
-        top: `${(capGuideRow / Math.max(1, gridSize)) * 100}%`,
-        height: '2px',
-        background: 'rgba(191,69,69,.35)'
-      }
-    }),
-    React.createElement('div', {
-      style: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
         top: `${(xHeightGuideRow / Math.max(1, gridSize)) * 100}%`,
         height: '2px',
         background: 'rgba(191,69,69,.65)'
-      }
-    }),
-    React.createElement('div', {
-      style: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: `${(baselineGuideRow / Math.max(1, gridSize)) * 100}%`,
-        height: '2px',
-        background: 'rgba(191,69,69,.9)'
-      }
-    }),
-    React.createElement('div', {
-      style: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: `${(descGuideRow / Math.max(1, gridSize)) * 100}%`,
-        height: '1px',
-        background: 'rgba(191,69,69,.45)'
       }
     }),
     showCenterGuide && React.createElement('div', {
@@ -595,15 +562,6 @@ const PreferencesModal = ({
                 gap: '10px'
               }
             },
-              React.createElement('div', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, `Fila CAP (${capGuideRow})`),
-              React.createElement('input', {
-                type: 'range',
-                min: 0,
-                max: Math.max(0, gridSize - 1),
-                value: capGuideRow,
-                onChange: e => setCapGuideRow(Number(e.target.value)),
-                style: { width: '100%', accentColor: ACCENT, cursor: 'pointer' }
-              }),
               React.createElement('div', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, `Fila X-Height (${xHeightGuideRow})`),
               React.createElement('input', {
                 type: 'range',
@@ -611,24 +569,6 @@ const PreferencesModal = ({
                 max: Math.max(0, gridSize - 1),
                 value: xHeightGuideRow,
                 onChange: e => setXHeightGuideRow(Number(e.target.value)),
-                style: { width: '100%', accentColor: ACCENT, cursor: 'pointer' }
-              }),
-              React.createElement('div', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, `Fila BASE (${baselineGuideRow})`),
-              React.createElement('input', {
-                type: 'range',
-                min: 0,
-                max: Math.max(0, gridSize - 1),
-                value: baselineGuideRow,
-                onChange: e => setBaselineGuideRow(Number(e.target.value)),
-                style: { width: '100%', accentColor: ACCENT, cursor: 'pointer' }
-              }),
-              React.createElement('div', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, `Fila DESC (${descGuideRow})`),
-              React.createElement('input', {
-                type: 'range',
-                min: 0,
-                max: Math.max(0, gridSize - 1),
-                value: descGuideRow,
-                onChange: e => setDescGuideRow(Number(e.target.value)),
                 style: { width: '100%', accentColor: ACCENT, cursor: 'pointer' }
               }),
               React.createElement('div', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, `Columna guía vertical (${centerGuideCol})`),
@@ -652,9 +592,40 @@ const PreferencesModal = ({
               'Activa una referencia visual para editar el espacio sin confundirlo con celdas vacías.',
               showSpaceMarker,
               setShowSpaceMarker
-            )
+            ),
+            guidePreview
           )
         )
+      ),
+      React.createElement('div', {
+        style: {
+          background: 'var(--surface2)',
+          border: '1px solid var(--border)',
+          borderRadius: R_BTN,
+          padding: '10px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px'
+        }
+      },
+        React.createElement('div', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, `Fila X-Height (${xHeightGuideRow})`),
+        React.createElement('input', {
+          type: 'range',
+          min: 0,
+          max: Math.max(0, gridSize - 1),
+          value: xHeightGuideRow,
+          onChange: e => setXHeightGuideRow(Number(e.target.value)),
+          style: { width: '100%', accentColor: ACCENT, cursor: 'pointer' }
+        }),
+        React.createElement('div', { style: { fontFamily: FONT_MONO, fontSize: '10px', color: 'var(--muted)' } }, `Columna guía vertical (${centerGuideCol})`),
+        React.createElement('input', {
+          type: 'range',
+          min: 0,
+          max: Math.max(0, gridSize - 1),
+          value: centerGuideCol,
+          onChange: e => setCenterGuideCol(Number(e.target.value)),
+          style: { width: '100%', accentColor: ACCENT, cursor: 'pointer' }
+        })
       ),
       React.createElement(Btn, { onClick: onClose, style: { alignSelf: 'flex-end' } }, 'Listo')
     )
@@ -663,22 +634,13 @@ const PreferencesModal = ({
 
 // ── Guide overlay SVG ─────────────────────────
 // Guías estilo foto de referencia: líneas rojas en posiciones de filas/columnas clave
-const GuideOverlay = ({
-  gridSize,
-  capGuideRow,
-  xHeightGuideRow,
-  baselineGuideRow,
-  descGuideRow,
-  centerGuideCol,
-  showCenterGuide
-}) => {
+const GuideOverlay = ({ gridSize, xHeightGuideRow, centerGuideCol, showCenterGuide }) => {
   const lines = [];
 
-  const defaults = defaultGuideRows(gridSize);
-  const capRow       = Math.min(gridSize - 1, Math.max(0, capGuideRow ?? defaults.cap));
-  const xHeightRow   = Math.min(gridSize - 1, Math.max(0, xHeightGuideRow ?? defaults.xHeight));
-  const baselineRow  = Math.min(gridSize - 1, Math.max(0, baselineGuideRow ?? defaults.baseline));
-  const descenderRow = Math.min(gridSize - 1, Math.max(0, descGuideRow ?? defaults.descender));
+  const capRow       = 1;
+  const xHeightRow   = Math.min(gridSize - 1, Math.max(0, xHeightGuideRow ?? Math.round(gridSize * 0.33)));
+  const baselineRow  = getBaselineRow(gridSize);
+  const descenderRow = gridSize - 1;
 
   const rowPct = (row) => (row / gridSize * 100).toFixed(4);
 
@@ -765,14 +727,10 @@ export function EditorPage({
   const [openUserMenu,    setOpenUserMenu]    = useState(false);
   const [avatarColor,     setAvatarColor]     = useState(ACCENT);
   const [showGuides,      setShowGuides]      = useState(true);
-  const defaults = defaultGuideRows(gridSize);
-  const [showSpaceMarker, setShowSpaceMarker] = useState(() => readBoolSetting(EDITOR_STORAGE_KEYS.showSpaceMarker, true));
-  const [showCenterGuide, setShowCenterGuide] = useState(() => readBoolSetting(EDITOR_STORAGE_KEYS.showCenterGuide, true));
-  const [centerGuideCol,  setCenterGuideCol]  = useState(() => readNumberSetting(EDITOR_STORAGE_KEYS.centerGuideCol, 2));
-  const [capGuideRow,     setCapGuideRow]     = useState(() => readNumberSetting(EDITOR_STORAGE_KEYS.capGuideRow, defaults.cap));
-  const [xHeightGuideRow, setXHeightGuideRow] = useState(() => readNumberSetting(EDITOR_STORAGE_KEYS.xHeightGuideRow, defaults.xHeight));
-  const [baselineGuideRow,setBaselineGuideRow]= useState(() => readNumberSetting(EDITOR_STORAGE_KEYS.baselineGuideRow, defaults.baseline));
-  const [descGuideRow,    setDescGuideRow]    = useState(() => readNumberSetting(EDITOR_STORAGE_KEYS.descGuideRow, defaults.descender));
+  const [showSpaceMarker, setShowSpaceMarker] = useState(() => localStorage.getItem('cs-show-space-marker') !== '0');
+  const [showCenterGuide, setShowCenterGuide] = useState(() => localStorage.getItem('cs-show-center-guide') !== '0');
+  const [centerGuideCol,  setCenterGuideCol]  = useState(() => Number(localStorage.getItem('cs-center-guide-col') ?? 2));
+  const [xHeightGuideRow, setXHeightGuideRow] = useState(() => Number(localStorage.getItem('cs-xheight-guide-row') ?? Math.round(gridSize * 0.33)));
 
   const avatarInit = (user?.displayName || user?.email || '?')[0].toUpperCase();
 
@@ -797,33 +755,18 @@ export function EditorPage({
     writeSetting(EDITOR_STORAGE_KEYS.showSpaceMarker, showSpaceMarker ? '1' : '0');
   }, [showSpaceMarker]);
   useEffect(() => {
-    writeSetting(EDITOR_STORAGE_KEYS.showCenterGuide, showCenterGuide ? '1' : '0');
+    localStorage.setItem('cs-show-center-guide', showCenterGuide ? '1' : '0');
   }, [showCenterGuide]);
   useEffect(() => {
     const clamped = Math.max(0, Math.min(gridSize - 1, centerGuideCol || 0));
     if (clamped !== centerGuideCol) setCenterGuideCol(clamped);
-    writeSetting(EDITOR_STORAGE_KEYS.centerGuideCol, clamped);
+    localStorage.setItem('cs-center-guide-col', String(clamped));
   }, [centerGuideCol, gridSize]);
   useEffect(() => {
     const clamped = Math.max(0, Math.min(gridSize - 1, xHeightGuideRow || 0));
     if (clamped !== xHeightGuideRow) setXHeightGuideRow(clamped);
-    writeSetting(EDITOR_STORAGE_KEYS.xHeightGuideRow, clamped);
+    localStorage.setItem('cs-xheight-guide-row', String(clamped));
   }, [xHeightGuideRow, gridSize]);
-  useEffect(() => {
-    const clamped = Math.max(0, Math.min(gridSize - 1, capGuideRow || 0));
-    if (clamped !== capGuideRow) setCapGuideRow(clamped);
-    writeSetting(EDITOR_STORAGE_KEYS.capGuideRow, clamped);
-  }, [capGuideRow, gridSize]);
-  useEffect(() => {
-    const clamped = Math.max(0, Math.min(gridSize - 1, baselineGuideRow || 0));
-    if (clamped !== baselineGuideRow) setBaselineGuideRow(clamped);
-    writeSetting(EDITOR_STORAGE_KEYS.baselineGuideRow, clamped);
-  }, [baselineGuideRow, gridSize]);
-  useEffect(() => {
-    const clamped = Math.max(0, Math.min(gridSize - 1, descGuideRow || 0));
-    if (clamped !== descGuideRow) setDescGuideRow(clamped);
-    writeSetting(EDITOR_STORAGE_KEYS.descGuideRow, clamped);
-  }, [descGuideRow, gridSize]);
 
   const modeTools = [
     { id: 'pencil',   iconName: 'pencil',   label: 'LIBRE'   },
@@ -1196,10 +1139,7 @@ export function EditorPage({
           ),
           React.createElement(GuideOverlay, {
             gridSize,
-            capGuideRow,
             xHeightGuideRow,
-            baselineGuideRow,
-            descGuideRow,
             centerGuideCol,
             showCenterGuide
           })
@@ -1323,14 +1263,8 @@ export function EditorPage({
       setShowCenterGuide,
       centerGuideCol,
       setCenterGuideCol,
-      capGuideRow,
-      setCapGuideRow,
       xHeightGuideRow,
       setXHeightGuideRow,
-      baselineGuideRow,
-      setBaselineGuideRow,
-      descGuideRow,
-      setDescGuideRow,
       gridSize
     })
   );
