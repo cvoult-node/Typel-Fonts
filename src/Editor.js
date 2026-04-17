@@ -770,7 +770,7 @@ export function EditorPage({
         React.createElement('div', {
           style: {
             background: 'var(--canvas-bg)', borderRadius: '6px', padding: '6px',
-            height: '30px', overflowX: 'auto', overflowY: 'hidden',
+            height: '50px', overflowX: 'auto', overflowY: 'hidden',
             display: 'flex', alignItems: 'center', whiteSpace: 'nowrap',
             scrollbarWidth: 'thin'
           }

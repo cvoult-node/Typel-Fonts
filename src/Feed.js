@@ -202,7 +202,7 @@ export function initFeedEvents(onCreateProject) {
 
   if (!modal || !btnNew || !btnClose || !btnConf || !inputName) return;
 
-  const FIXED_SIZE = 14;
+  const FIXED_SIZE = 16;
 
   btnConf._onCreate = onCreateProject;
 

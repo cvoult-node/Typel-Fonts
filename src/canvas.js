@@ -42,7 +42,9 @@ export function shiftGrid(grid, size, dir) {
  * Para otros tamaños: ~67% del alto.
  */
 export function getBaselineRow(gridSize) {
-  return Math.round(gridSize * 0.67);
+  // Para 16×16: baseline en fila 12 (deja 4 filas para descenders = 25%)
+  // Para otros tamaños: ~75% del alto
+  return Math.round(gridSize * 0.75);
 }
 
 /**
