@@ -37,8 +37,19 @@ export function shiftGrid(grid, size, dir) {
 }
 
 /**
+ * Calcula la fila de baseline para un gridSize dado.
+ * Para 12×12: baseline en fila 8 (deja 3 filas para descenders).
+ * Para otros tamaños: ~67% del alto.
+ */
+export function getBaselineRow(gridSize) {
+  // Para 16×16: baseline en fila 12 (deja 4 filas para descenders = 25%)
+  // Para otros tamaños: ~75% del alto
+  return Math.round(gridSize * 0.75);
+}
+
+/**
  * Exportar font data → opentype.Font y descargar
- * @param {Object} meta - { fontName, author, letterSpacing, wordSpacing, unitsPerEm, ascender, descender }
+ * @param {Object} meta - { fontName, author, letterSpacing, wordSpacing, extraSpace, unitsPerEm, ascender, descender }
  */
 export function buildAndDownload(fontData, gridSize, filename, format, meta = {}) {
   const ot = window.__opentype__;
@@ -56,13 +67,20 @@ export function buildAndDownload(fontData, gridSize, filename, format, meta = {}
     author        = '',
     letterSpacing = 0,
     wordSpacing   = 10,
+    extraSpace    = 1,
     unitsPerEm    = 1000,
     ascender      = 800,
-    descender     = -200,
+    descender     = -250,
   } = meta;
 
-  const S = 100;
-  const pxSpacing = Math.round(letterSpacing * 10);
+  // Escala: cada píxel del canvas → S unidades opentype
+  // letterSpacing ya está en px del canvas, se convierte directamente
+  const S = 10;
+  const pxSpacing = Math.round(letterSpacing * S);
+
+  // Fila de baseline (0-indexed desde arriba del grid)
+  // Para 12×12: fila 8, dejando filas 9-11 para descenders
+  const baselineRow = getBaselineRow(gridSize);
 
   const getGlyphBounds = (glyph = []) => {
     let minCol = gridSize, maxCol = -1;
@@ -83,21 +101,41 @@ export function buildAndDownload(fontData, gridSize, filename, format, meta = {}
   Object.keys(fontData).forEach(char => {
     const glyphGrid = fontData[char] || [];
     const bounds = getGlyphBounds(glyphGrid);
-    const path = new ot.Path();
-    glyphGrid.forEach((on, i) => {
-      if (!on) return;
-      const col = i % gridSize;
-      const x = ((bounds ? (col - bounds.minCol) : col)) * S;
-      const y = (gridSize - 1 - Math.floor(i / gridSize)) * S;
-      path.moveTo(x, y); path.lineTo(x+S, y);
-      path.lineTo(x+S, y+S); path.lineTo(x, y+S);
-      path.close();
-    });
 
-    const glyphWidth = bounds ? (bounds.widthCols * S) : 0;
-    const minAdvance = S;
+    if (!bounds && char !== ' ') return;
+
+    const path = new ot.Path();
+    if (bounds) {
+      glyphGrid.forEach((on, i) => {
+        if (!on) return;
+        const row = Math.floor(i / gridSize);
+        const col = i % gridSize;
+
+        // X: desplazar para que empiece en 0 (sin margen izquierdo vacío)
+        const x = (col - bounds.minCol) * S;
+
+        // Y: positivo = sobre la baseline, negativo = descender
+        // row=0 (arriba del grid) → y más alto sobre baseline
+        // row=baselineRow → y=0 (baseline)
+        // row > baselineRow → y negativo (descender)
+        // Cada píxel debe "apoyar" su borde inferior en baseline cuando row === baselineRow.
+        // Con esto evitamos que toda la fuente quede ~1px (S unidades) más arriba.
+        const y = (baselineRow - row - 1) * S;
+
+        // Dibujar cuadrado de píxel (orientación opentype: y crece hacia arriba)
+        path.moveTo(x,     y);
+        path.lineTo(x + S, y);
+        path.lineTo(x + S, y + S);
+        path.lineTo(x,     y + S);
+        path.close();
+      });
+    }
+
+    const glyphWidth  = bounds ? (bounds.widthCols * S) : 0;
+    const minAdvance  = S;
+
     const advance = char === ' '
-      ? Math.max(minAdvance, Math.round(wordSpacing * 10))
+      ? Math.max(minAdvance, Math.round(wordSpacing * S))
       : Math.max(minAdvance, glyphWidth + pxSpacing);
 
     glyphs.push(new ot.Glyph({

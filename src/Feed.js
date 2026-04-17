@@ -2,9 +2,10 @@
 //  Feed.js  —  DOM vanilla puro
 // ─────────────────────────────────────────────
 import { signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { auth }    from './firebase.js';
+import { auth, db, setDoc, doc, collection, query, where, orderBy, limit, getDocs } from './firebase.js';
+import { createGlyphGrid, countGlyphs } from './pixelRenderer.js';
 
-export function renderFeed(proyectos, onOpen, onDelete, onRename) {
+export function renderFeed(proyectos, onOpen, onDelete, onRename, onConfirm) {
   const container = document.getElementById('projects-list');
   if (!container) return;
   container.innerHTML = '';
@@ -22,8 +23,7 @@ export function renderFeed(proyectos, onOpen, onDelete, onRename) {
   proyectos.forEach(proyecto => {
     const card = document.createElement('div');
     card.className = 'card';
-    const glyphCount = Object.values(proyecto.font || {})
-      .filter(g => Array.isArray(g) && g.some(Boolean)).length;
+    const glyphCount = countGlyphs(proyecto.font);
 
     const GRID_LABEL = `${proyecto.gridSize || 8}×${proyecto.gridSize || 8}PX`;
 
@@ -55,7 +55,11 @@ export function renderFeed(proyectos, onOpen, onDelete, onRename) {
     card.querySelector('.btn-open').onclick = () => onOpen(proyecto);
     card.querySelector('.btn-del').onclick  = (e) => {
       e.stopPropagation();
-      if (confirm(`¿Borrar "${proyecto.nombre}"?`)) onDelete(proyecto.id);
+      if (typeof onConfirm === 'function') {
+        onConfirm(`¿Borrar "${proyecto.nombre}"?`, () => onDelete(proyecto.id));
+      } else if (confirm(`¿Borrar "${proyecto.nombre}"?`)) {
+        onDelete(proyecto.id);
+      }
     };
 
     // ── Inline rename ──
@@ -120,15 +124,65 @@ function renderMiniPreview(container, proyecto) {
   const size = proyecto.gridSize || 8;
   ['A','B','C','D'].forEach(char => {
     const glyph = proyecto.font?.[char] || [];
-    const grid  = document.createElement('div');
-    grid.style.cssText = `display:grid;grid-template-columns:repeat(${size},3px);gap:0;`;
-    for (let i = 0; i < size * size; i++) {
-      const px = document.createElement('div');
-      px.style.cssText = `width:3px;height:3px;background:${glyph[i] ? 'var(--accent)' : 'var(--pixel-empty)'};`;
-      grid.appendChild(px);
-    }
+    const grid  = createGlyphGrid(glyph, size, 3, 'var(--accent)');
     container.appendChild(grid);
   });
+}
+
+export async function cargarFuentesComunidad(currentUid) {
+  const q = query(collection(db, 'posts'), where('uid', '!=', currentUid), orderBy('uid'), orderBy('publishedAt', 'desc'), limit(12));
+  const snp = await getDocs(q);
+  return snp.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export function renderComunidad(posts, onImport) {
+  const list = document.getElementById('community-list');
+  const count = document.getElementById('community-count');
+  if (count) count.textContent = `${posts.length} DISPONIBLE${posts.length === 1 ? '' : 'S'}`;
+  if (!list) return;
+  list.innerHTML = '';
+  if (!posts.length) {
+    list.innerHTML = '<div class="community-card"><div class="community-meta">No hay fuentes publicadas por otros usuarios todavía.</div></div>';
+    return;
+  }
+  posts.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'community-card';
+    card.innerHTML = `
+      <div>
+        <div class="community-name">${post.fontNombre || 'Sin nombre'}</div>
+        <div class="community-meta">por ${post.autorNombre || post.autorEmail || 'Anónimo'} · ${post.gridSize || 8}px</div>
+      </div>
+      <button class="btn-download">IMPORTAR</button>
+    `;
+    card.querySelector('.btn-download').onclick = () => onImport(post);
+    list.appendChild(card);
+  });
+}
+
+export function importarFuente(user, post, onSuccess, onConfirm) {
+  const doImport = () => {
+    const id = Date.now().toString();
+    const nuevoProyecto = {
+      nombre: `${post.fontNombre} (Copia)`,
+      gridSize: post.gridSize || 8,
+      font: post.font || {},
+      updatedAt: new Date(),
+      importadoDe: post.id
+    };
+    setDoc(doc(db, 'usuarios', user.uid, 'proyectos', id), nuevoProyecto)
+      .then(() => { onSuccess && onSuccess(); })
+      .catch(err => {
+        console.error(err);
+        alert('Error al importar la fuente.');
+      });
+  };
+
+  if (typeof onConfirm === 'function') {
+    onConfirm(`¿Importar "${post.fontNombre}" a tus proyectos?`, doImport);
+  } else if (confirm(`¿Importar "${post.fontNombre}" a tus proyectos?`)) {
+    doImport();
+  }
 }
 
 let feedEventsInit = false;
@@ -148,20 +202,7 @@ export function initFeedEvents(onCreateProject) {
 
   if (!modal || !btnNew || !btnClose || !btnConf || !inputName) return;
 
-  let selectedSize = 8;
-
-  // Grid size buttons
-  const sizeButtons = document.querySelectorAll('.grid-size-btn');
-  sizeButtons.forEach(btn => {
-    btn.onclick = () => {
-      sizeButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedSize = parseInt(btn.dataset.size, 10);
-    };
-  });
-  // Set default active
-  const defaultBtn = document.querySelector('.grid-size-btn[data-size="8"]');
-  if (defaultBtn) defaultBtn.classList.add('active');
+  const FIXED_SIZE = 16;
 
   btnConf._onCreate = onCreateProject;
 
@@ -169,9 +210,6 @@ export function initFeedEvents(onCreateProject) {
     modal.classList.remove('hidden');
     inputName.value = '';
     inputName.focus();
-    selectedSize = 8;
-    sizeButtons.forEach(b => b.classList.remove('active'));
-    if (defaultBtn) defaultBtn.classList.add('active');
   };
   btnClose.onclick  = () => modal.classList.add('hidden');
   modal.onclick     = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
@@ -185,16 +223,16 @@ export function initFeedEvents(onCreateProject) {
       setTimeout(() => inputName.style.borderColor = '', 1000);
       return;
     }
-    const validName = /^[\p{L}\p{N}-]+$/u.test(nombre);
+    const validName = /^[A-Za-z0-9À-ÖØ-öø-ÿ\u00C0-\u024F\- ]+$/.test(nombre);
     if (!validName) {
       inputName.focus();
       inputName.style.borderColor = 'var(--accent)';
       setTimeout(() => inputName.style.borderColor = '', 1000);
-      alert('Usa solo letras, números y guiones.');
+      alert('Usa solo letras, números, espacios y guiones.');
       return;
     }
     btnConf.disabled = true; btnConf.textContent = '...';
-    try { await btnConf._onCreate(nombre, selectedSize); }
+    try { await btnConf._onCreate(nombre, FIXED_SIZE); }
     catch (err) { console.error(err); alert('No se pudo crear el proyecto.'); }
     finally { btnConf.disabled = false; btnConf.textContent = 'CREAR'; modal.classList.add('hidden'); }
   };

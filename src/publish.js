@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────
 import { db } from './firebase.js';
 import {
-  doc, setDoc, getDoc, serverTimestamp
+  doc, setDoc, getDoc, serverTimestamp, deleteDoc
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 /**
@@ -62,4 +62,11 @@ export async function publishFont(user, proyecto, previewText = 'HELLO') {
   // merge:true preserva campos como likes o comentarios que no están en data
   await setDoc(postRef, data, { merge: true });
   return postId;
+}
+
+/**
+ * Elimina un post público.
+ */
+export async function deletePost(postId) {
+  await deleteDoc(doc(db, 'posts', postId));
 }
