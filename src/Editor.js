@@ -189,7 +189,7 @@ const ExportModal = ({ projectName, fontData, gridSize, previewText: extText, on
       e('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px' } },
         e('label', { style: { fontFamily: FONT_MONO, fontSize: '8px', letterSpacing: '2px', color: 'var(--muted)' } }, 'FORMATO'),
         e('div', { style: { display: 'flex', gap: '8px' } },
-          ['otf', 'ttf', 'woff'].map(f => e('button', { key: f, onClick: () => setFormat(f), style: { flex: 1, padding: '10px', borderRadius: R_BTN, cursor: 'pointer', fontFamily: FONT_MONO, fontWeight: '700', fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', transition: 'all .13s', background: format === f ? ACCENT : 'var(--surface2)', color: format === f ? '#fff' : 'var(--muted)', border: format === f ? 'none' : '1px solid var(--border)' } }, f))
+          ['otf', 'ttf', 'woff'].map(f => e('button', { key: f, onClick: () => setFormat(f), style: { flex: 1, padding: '10px', borderRadius: R_BTN, cursor: 'pointer', fontFamily: FONT_MONO, fontWeight: '700', fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', transition: 'all .13s', background: format === f ? ACCENT : 'var(--surface)', color: format === f ? '#fff' : 'var(--muted)', border: format === f ? 'none' : '1px solid var(--border)' } }, f))
         )
       ),
       e('div', { style: { display: 'flex', gap: '10px', paddingTop: '4px' } },
