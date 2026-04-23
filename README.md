@@ -1,54 +1,133 @@
-# CodeShelf — Pixel Font Studio
+# Typel Fonts — Pixel Font Studio
 
-Editor web para crear, editar y compartir fuentes pixel art. Gratis y de código abierto.
+**![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Version](https://img.shields.io/badge/version-v1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)**
 
-## Stack
+Crea, edita y comparte fuentes pixel art directamente desde tu navegador.
+Rápido, moderno y pensado para creadores.
 
-- **Frontend**: Vanilla JS + React (via ESM) + Vite
-- **Auth & DB**: Firebase (Authentication + Firestore)
-- **Fuentes**: opentype.js (exportación OTF/TTF)
+---
 
-## Instalación
+## ✨ Features
+
+* Editor de glifos pixel a pixel
+* Previsualización en tiempo real
+* Exportación de fuentes (OTF / TTF)
+* Feed de fuentes de la comunidad
+* Sistema de autenticación
+* Interfaz optimizada y ligera
+
+---
+
+## 🚀 Visión
+
+Typel Fonts busca convertirse en una plataforma completa para la creación y distribución de fuentes pixel art.
+
+Próximamente:
+
+* Marketplace de fuentes
+* Perfiles públicos de creadores
+* Funciones avanzadas de exportación
+* Opciones premium
+
+---
+
+## 🧱 Stack
+
+* **Frontend**: Vanilla JS + React (ESM) + Vite
+* **Backend / DB**: Firebase (Authentication + Firestore)
+* **Fuentes**: opentype.js
+
+---
+
+## ⚙️ Instalación
 
 ```bash
 npm install
 ```
 
-## Configuración
+---
 
-1. Copia el archivo de entorno:
-   ```bash
-   cp .env.example .env
-   ```
-2. Rellena tus credenciales de Firebase en `src/env.js` (ver `src/env.example` como referencia).
-
-## Desarrollo
+## 🧪 Desarrollo
 
 ```bash
 npm run dev
-# Abre http://localhost:3000
 ```
 
-## Build de producción
+Abrir en:
+
+```
+http://localhost:3000
+```
+
+---
+
+## 📦 Build
 
 ```bash
 npm run build
 ```
 
-## Estructura
+---
+
+## 🔐 Configuración
+
+1. Copia el archivo de entorno:
+
+```bash
+cp .env.example .env
+```
+
+2. Configura Firebase en:
+
+```
+src/env.js
+```
+
+Usa `src/env.example` como referencia.
+
+---
+
+## 📁 Estructura
 
 ```
 src/
-  App.js          — Componente raíz (React)
-  Editor.js       — Editor de glifos pixel a pixel
-  Feed.js         — Feed de proyectos del usuario
-  firebase.js     — Inicialización Firebase
-  canvas.js       — Algoritmos de grid (flood fill, shift, export)
-  pixelRenderer.js — Renderizado de glifos como DOM/Canvas
-  publish.js      — Publicación de fuentes en Firestore
-  navbar-shared.js — Navbar compartida (vanilla JS)
-  shared.css      — Variables CSS y estilos globales
-  constants.js    — Paleta y constantes
-  ui.js           — Primitivos UI (Btn, Modal, Overlay...)
-  env.js          — Credenciales Firebase (NO subir a Git)
+  App.js
+  Editor.js
+  Feed.js
+  firebase.js
+  canvas.js
+  pixelRenderer.js
+  publish.js
+  navbar-shared.js
+  shared.css
+  constants.js
+  ui.js
+  env.js (no subir)
 ```
+
+---
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas.
+Puedes abrir issues o pull requests para mejorar el proyecto.
+
+---
+
+## 📄 Licencia
+
+MIT — libre para uso, modificación y distribución.
+
+---
+
+## ⚠️ Nota
+
+Este proyecto es open source, pero la plataforma Typel Fonts puede incluir funcionalidades adicionales, servicios o integraciones no incluidas en este repositorio.
+
+---
+
+## 🚀 Typel Fonts
+
+Diseña fuentes. Comparte ideas. Construye algo único.
