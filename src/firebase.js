@@ -24,16 +24,13 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ⚠️  Las credenciales se cargan desde src/env.js (no incluido en Git).
-//     Copia src/env.example.js → src/env.js y rellena tus valores.
-const __env = window.__ENV__ || {};
 const firebaseConfig = {
-  apiKey:            __env.FIREBASE_API_KEY,
-  authDomain:        __env.FIREBASE_AUTH_DOMAIN,
-  projectId:         __env.FIREBASE_PROJECT_ID,
-  storageBucket:     __env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: __env.FIREBASE_MESSAGING_SENDER_ID,
-  appId:             __env.FIREBASE_APP_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
